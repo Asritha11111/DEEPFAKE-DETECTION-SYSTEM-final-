@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepGuard AI | Deepfake Detector</title>
+  <style>
+    /* ----- VIBRANT CSS VARIABLES ----- */
+    :root {
+      --bg-dark: #0a0a1a;
+      --bg-light: #f4f4fc;
+      --primary: #6c2bd9;
+      --primary-glow: #8a3ff2;
+      --secondary: #ff4d6d;
+      --accent: #3b82f6;
+      --text-light: #ffffff;
+      --text-dark: #0f0f2a;
+      --card-bg-dark: rgba(15, 15, 35, 0.7);
+      --card-bg-light: rgba(255, 255, 255, 0.8);
+      --border-dark: rgba(255,255,255,0.1);
+      --border-light: rgba(0,0,0,0.1);
+      --glow: 0 0 20px rgba(108, 43, 217, 0.5);
+      --transition: all 0.3s ease;
+    }
+    body {
+      font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--text-light);
+      overflow-x: hidden;
+      transition: background 0.3s;
+    }
+    body.light {
+      background: linear-gradient(135deg, #f5f7ff, #e9eef9);
+      color: var(--text-dark);
+    }
+    /* Animated background elements */
+    .blob {
+      position: fixed;
+      width: 50vw;
+      height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108,43,217,0.4) 0%, rgba(255,77,109,0.2) 100%);
+      filter: blur(80px);
+      z-index: 0;
+      animation: float 20s infinite ease-in-out;
+    }
+    .blob1 { top: -20vh; left: -20vw; }
+    .blob2 { bottom: -30vh; right: -20vw; background: radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(108,43,217,0.1) 100%); animation-delay: -7s; }
+    @keyframes float {
+      0% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(5%,5%) scale(1.1); }
+      100% { transform: translate(0,0) scale(1); }
+    }
+    /* Main container */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1rem;
+      position: relative;
+      z-index: 10;
+    }
+    /* Header */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff4d6d, #8a3ff2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      padding: 0.5rem 1.2rem;
+      border-radius: 3rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--glow);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 3rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(108,43,217,0.8);
+    }
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem 3rem;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff, #8a3ff2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      opacity: 0.9;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    /* Stats cards */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 3rem 0;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      text-align: center;
+      width: 180px;
+      border: 1px solid var(--border-dark);
+      transition: var(--transition);
+    }
+    body.light .stat-card {
+      background: var(--card-bg-light);
+      border-color: var(--border-light);
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(108,43,217,0.3);
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    /* How it works */
+    .how-it-works {
+      text-align: center;
+      margin: 4rem 0;
+    }
+    .cards {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .info-card {
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      width: 250px;
+      border: 1px solid var(--border-dark);
+      transition: var(--transition);
+    }
+    body.light .info-card {
+      background: var(--card-bg-light);
+    }
+    .info-card:hover {
+      transform: translateY(-5px);
+    }
+    .info-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    /* Model info section */
+    .model-info {
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      padding: 2rem;
+      margin: 3rem 0;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    body.light .model-info {
+      background: var(--card-bg-light);
+    }
+    .model-detail {
+      text-align: center;
+    }
+    .model-detail h4 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--secondary);
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border-dark);
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    /* Sections visibility */
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    /* Auth and Dashboard (same as before, with vibrant colors) */
+    .card {
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-dark);
+    }
+    body.light .card {
+      background: var(--card-bg-light);
+    }
+    .form-group input {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-dark);
+      color: inherit;
+      border-radius: 2rem;
+      padding: 0.7rem 1rem;
+      width: 100%;
+    }
+    body.light .form-group input {
+      background: rgba(0,0,0,0.05);
+    }
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .real-badge { background: rgba(74,222,128,0.2); color: #4ade80; }
+    .fake-badge { background: rgba(248,113,113,0.2); color: #f87171; }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(8px);
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      z-index: 1000;
+      display: none;
+      border-left: 4px solid var(--primary);
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.2rem; }
+      .stats { gap: 1rem; }
+      .stat-card { width: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="container">
+    <!-- Navbar -->
+    <div class="navbar">
+      <div class="logo">🔍 DeepGuard AI</div>
+      <div class="nav-buttons">
+        <button class="btn-outline" id="themeToggle">🌙 Dark</button>
+        <button class="btn-primary" id="tryNowBtn">Try Now →</button>
+        <button class="btn-outline" id="logoutBtn" style="display: none;">Logout</button>
+      </div>
+    </div>
+
+    <!-- Landing Page (visible when not logged in) -->
+    <div id="landingSection" class="section active">
+      <div class="hero">
+        <h1>AI-Powered Detection</h1>
+        <p>Detect manipulated media with state-of-the-art AI. Upload images or videos and get instant analysis powered by the MesoNet architecture.</p>
+        <div class="cta-buttons">
+          <button class="btn-primary" id="landingTryBtn">Try Now →</button>
+          <button class="btn-outline" id="learnMoreBtn">Learn More</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number">MesoNet</div>
+          <div>Model</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">~95%</div>
+          <div>Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">Celeb-DF</div>
+          <div>Dataset</div>
+        </div>
+      </div>
+      <div class="how-it-works">
+        <h2>How It Works</h2>
+        <div class="cards">
+          <div class="info-card">
+            <div class="info-icon">📤</div>
+            <h3>Upload Media</h3>
+            <p>Drop an image or video for analysis</p>
+          </div>
+          <div class="info-card">
+            <div class="info-icon">🧠</div>
+            <h3>AI Analysis</h3>
+            <p>MesoNet model processes the content</p>
+          </div>
+          <div class="info-card">
+            <div class="info-icon">📊</div>
+            <h3>Get Results</h3>
+            <p>View confidence scores and verdict</p>
+          </div>
+        </div>
+      </div>
+      <div class="model-info">
+        <div class="model-detail">
+          <h4>ARCHITECTURE</h4>
+          <p><strong>MesoNet</strong><br>Mesoscopic feature analysis CNN</p>
+        </div>
+        <div class="model-detail">
+          <h4>ACCURACY</h4>
+          <p><strong>~95%</strong><br>Validated on benchmark datasets</p>
+        </div>
+        <div class="model-detail">
+          <h4>TRAINING DATA</h4>
+          <p><strong>Celeb-DF</strong><br>High-quality celebrity deepfakes</p>
+        </div>
+      </div>
+      <footer>
+        DeepGuard © 2026 • Real-time Detection • <span id="learnMoreSpan">Learn more about deepfakes</span>
+      </footer>
+    </div>
+
+    <!-- Authentication Section (Login/Signup) -->
+    <div id="authSection" class="section">
+      <div class="card" style="max-width: 500px; margin: 2rem auto;">
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+          <button class="tab-btn active" data-tab="login">Login</button>
+          <button class="tab-btn" data-tab="signup">Sign Up</button>
+        </div>
+        <div id="loginForm" class="auth-form active">
+          <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+          <button class="btn-primary" id="loginBtn" style="width:100%">Login</button>
+          <p style="text-align: center; margin-top: 1rem;">Demo: any email/password</p>
+        </div>
+        <div id="signupForm" class="auth-form" style="display:none">
+          <div class="form-group"><label>Name</label><input type="text" id="signupName" placeholder="John Doe"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
+          <div class="form-group"><label>Confirm</label><input type="password" id="signupConfirm" placeholder="••••••••"></div>
+          <button class="btn-primary" id="signupBtn" style="width:100%">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard (after login) -->
+    <div id="dashboardSection" class="section">
+      <div class="card">
+        <h2>Welcome, <span id="userName"></span>!</h2>
+        <p>Upload an image to detect deepfakes.</p>
+      </div>
+      <div class="card">
+        <div class="upload-area" id="uploadArea">
+          <div>📸 Drag & drop or click to upload</div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
+        </div>
+        <div class="preview" id="preview" style="display:none; text-align:center; margin:1rem 0"><img id="previewImage" style="max-width:200px; border-radius:1rem"></div>
+        <button class="btn-primary" id="predictBtn" disabled style="width:100%">Detect Deepfake</button>
+        <div id="loader" style="display:none; text-align:center; margin:1rem">Analyzing...</div>
+        <div id="resultContainer" style="display:none; text-align:center; margin-top:1rem">
+          <div style="position:relative; width:120px; height:120px; margin:0 auto">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+              <circle id="progressCircle" cx="60" cy="60" r="50" fill="none" stroke="var(--primary)" stroke-width="8" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div id="confidenceText" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.4rem; font-weight:bold"></div>
+          </div>
+          <h3 id="resultTitle"></h3>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📜 History</h3>
+        <div id="historyList"></div>
+        <button class="btn-outline" id="clearHistoryBtn" style="margin-top:1rem">Clear History</button>
+      </div>
+      <div class="card">
+        <h3>🧠 Model Info</h3>
+        <p><strong>Architecture:</strong> MesoNet (custom CNN)</p>
+        <p><strong>Accuracy:</strong> ~95% on Celeb-DF</p>
+      </div>
+      <div class="card">
+        <h3>⚙️ Admin Panel (Training)</h3>
+        <button class="btn-outline" id="trainBtn">Retrain Model</button>
+        <div id="trainLogs" style="font-size:0.8rem; margin-top:1rem"></div>
+      </div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ---------- DOM Elements ----------
+    const landingSection = document.getElementById('landingSection');
+    const authSection = document.getElementById('authSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const tryNowBtn = document.getElementById('tryNowBtn');
+    const landingTryBtn = document.getElementById('landingTryBtn');
+    const learnMoreBtn = document.getElementById('learnMoreBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    // Auth elements
+    const loginFormDiv = document.getElementById('loginForm');
+    const signupFormDiv = document.getElementById('signupForm');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    // Dashboard elements
+    const userNameSpan = document.getElementById('userName');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const previewImage = document.getElementById('previewImage');
+    const predictBtn = document.getElementById('predictBtn');
+    const loader = document.getElementById('loader');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultTitle = document.getElementById('resultTitle');
+    const confidenceText = document.getElementById('confidenceText');
+    const progressCircle = document.getElementById('progressCircle');
+    const historyList = document.getElementById('historyList');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const trainBtn = document.getElementById('trainBtn');
+    const trainLogs = document.getElementById('trainLogs');
+
+    let selectedFile = null;
+    let currentUser = null;
+
+    // Toast
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.borderLeftColor = isError ? '#f87171' : '#4ade80';
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    // Auth UI update
+    function updateAuthUI() {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        currentUser = JSON.parse(stored);
+        userNameSpan.textContent = currentUser.name;
+        landingSection.classList.remove('active');
+        authSection.classList.remove('active');
+        dashboardSection.classList.add('active');
+        logoutBtn.style.display = 'block';
+        loadHistory();
+      } else {
+        currentUser = null;
+        landingSection.classList.add('active');
+        authSection.classList.remove('active');
+        dashboardSection.classList.remove('active');
+        logoutBtn.style.display = 'none';
+      }
+    }
+
+    function login(email, pass) {
+      if (!email || !pass) { showToast('Enter email/password', true); return false; }
+      const user = { name: email.split('@')[0], email };
+      localStorage.setItem('user', JSON.stringify(user));
+      updateAuthUI();
+      showToast('Logged in');
+      return true;
+    }
+    function signup(name, email, pass, confirm) {
+      if (!name || !email || !pass || !confirm) { showToast('All fields required', true); return false; }
+      if (pass !== confirm) { showToast('Passwords do not match', true); return false; }
+      if (!email.includes('@')) { showToast('Invalid email', true); return false; }
+      const user = { name, email };
+      localStorage.setItem('user', JSON.stringify(user));
+      updateAuthUI();
+      showToast('Account created!');
+      return true;
+    }
+    function logout() {
+      localStorage.removeItem('user');
+      updateAuthUI();
+      showToast('Logged out');
+    }
+
+    // History
+    function addToHistory(fileName, result, confidence) {
+      const hist = JSON.parse(localStorage.getItem('history') || '[]');
+      hist.unshift({ fileName, result, confidence, date: new Date().toLocaleString() });
+      if (hist.length > 20) hist.pop();
+      localStorage.setItem('history', JSON.stringify(hist));
+      loadHistory();
+    }
+    function loadHistory() {
+      const hist = JSON.parse(localStorage.getItem('history') || '[]');
+      if (!hist.length) { historyList.innerHTML = '<p>No history yet.</p>'; return; }
+      historyList.innerHTML = hist.map(item => `
+        <div class="history-item">
+          <div><strong>${item.fileName}</strong><br><small>${item.date}</small></div>
+          <div><span class="history-result ${item.result === 'REAL' ? 'real-badge' : 'fake-badge'}">${item.result}</span><br>${(item.confidence*100).toFixed(1)}%</div>
+        </div>
+      `).join('');
+    }
+    function clearHistory() { localStorage.removeItem('history'); loadHistory(); showToast('History cleared'); }
+
+    // Prediction
+    async function predict(file) {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch('/api/predict', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return { is_real: data.is_real, confidence: data.confidence };
+    }
+    function updateResultUI(isReal, confidence) {
+      const result = isReal ? 'REAL' : 'FAKE';
+      resultTitle.textContent = result === 'REAL' ? '✅ REAL IMAGE' : '❌ DEEPFAKE DETECTED';
+      resultTitle.style.color = isReal ? '#4ade80' : '#f87171';
+      confidenceText.textContent = `${(confidence*100).toFixed(1)}%`;
+      const circumference = 314; // 2*pi*50
+      const offset = circumference * (1 - confidence);
+      progressCircle.style.stroke = isReal ? '#4ade80' : '#f87171';
+      progressCircle.style.strokeDashoffset = offset;
+      resultContainer.style.display = 'block';
+    }
+    async function handlePrediction() {
+      if (!selectedFile) return;
+      predictBtn.disabled = true;
+      loader.style.display = 'block';
+      try {
+        const result = await predict(selectedFile);
+        updateResultUI(result.is_real, result.confidence);
+        addToHistory(selectedFile.name, result.is_real ? 'REAL' : 'FAKE', result.confidence);
+      } catch (err) {
+        showToast(err.message, true);
+      } finally {
+        predictBtn.disabled = false;
+        loader.style.display = 'none';
+      }
+    }
+    function handleFile(file) {
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        previewImage.src = e.target.result;
+        preview.style.display = 'block';
+        predictBtn.disabled = false;
+        resultContainer.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Training mock
+    async function trainModel() {
+      trainLogs.innerHTML = 'Training started...';
+      try {
+        const res = await fetch('/api/train', { method: 'POST' });
+        const data = await res.json();
+        trainLogs.innerHTML = `Training completed: ${data.message || 'Model updated'}`;
+        showToast('Training completed');
+      } catch {
+        trainLogs.innerHTML = 'Training endpoint not implemented';
+        showToast('Training endpoint not ready', true);
+      }
+    }
+
+    // Theme
+    function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light') {
+        document.body.classList.add('light');
+        themeToggle.textContent = '🌞 Light';
+      } else {
+        document.body.classList.remove('light');
+        themeToggle.textContent = '🌙 Dark';
+      }
+    }
+    function toggleTheme() {
+      if (document.body.classList.contains('light')) {
+        document.body.classList.remove('light');
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '🌙 Dark';
+      } else {
+        document.body.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌞 Light';
+      }
+    }
+
+    // Event listeners
+    tryNowBtn.addEventListener('click', () => { authSection.classList.add('active'); landingSection.classList.remove('active'); });
+    landingTryBtn.addEventListener('click', () => { authSection.classList.add('active'); landingSection.classList.remove('active'); });
+    learnMoreBtn.addEventListener('click', () => { window.scrollTo({ top: document.querySelector('.how-it-works').offsetTop, behavior: 'smooth' }); });
+    logoutBtn.addEventListener('click', logout);
+    themeToggle.addEventListener('click', toggleTheme);
+    // Auth tabs
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.tab;
+        if (target === 'login') {
+          loginFormDiv.style.display = 'block';
+          signupFormDiv.style.display = 'none';
+        } else {
+          loginFormDiv.style.display = 'none';
+          signupFormDiv.style.display = 'block';
+        }
+      });
+    });
+    loginBtn.addEventListener('click', () => login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value));
+    signupBtn.addEventListener('click', () => signup(document.getElementById('signupName').value, document.getElementById('signupEmail').value, document.getElementById('signupPassword').value, document.getElementById('signupConfirm').value));
+    // Upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', e => e.preventDefault());
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handleFile(file);
+      else showToast('Please drop an image', true);
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+    predictBtn.addEventListener('click', handlePrediction);
+    clearHistoryBtn.addEventListener('click', clearHistory);
+    trainBtn.addEventListener('click', trainModel);
+
+    // Initialize
+    initTheme();
+    updateAuthUI();
+    // Prefill login for demo
+    document.getElementById('loginEmail').value = 'demo@example.com';
+    document.getElementById('loginPassword').value = 'demo';
+  </script>
+</body>
+</html>
