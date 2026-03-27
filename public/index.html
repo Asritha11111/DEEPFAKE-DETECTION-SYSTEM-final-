@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>DeepGuard AI | Deepfake Detector</title>
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
-    /* ----- VIBRANT CSS VARIABLES ----- */
+    /* ----- VIBRANT CSS VARIABLES (unchanged) ----- */
     :root {
       --bg-dark: #0a0a1a;
       --bg-light: #f4f4fc;
@@ -81,6 +85,7 @@
     .nav-buttons {
       display: flex;
       gap: 1rem;
+      align-items: center;
     }
     .btn-outline {
       background: transparent;
@@ -110,6 +115,15 @@
     .btn-primary:hover {
       transform: scale(1.05);
       box-shadow: 0 0 20px rgba(108,43,217,0.8);
+    }
+    /* Language switcher */
+    .lang-switch {
+      background: transparent;
+      border: 1px solid var(--border-dark);
+      border-radius: 2rem;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      color: inherit;
     }
     /* Hero Section */
     .hero {
@@ -240,7 +254,75 @@
     .section.active {
       display: block;
     }
-    /* Auth and Dashboard (same as before, with vibrant colors) */
+    /* Auth Card (Improved) */
+    .auth-card {
+      max-width: 500px;
+      margin: 2rem auto;
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 2rem;
+      border: 1px solid var(--border-dark);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      transition: var(--transition);
+    }
+    body.light .auth-card {
+      background: var(--card-bg-light);
+    }
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-dark);
+      border-radius: 2rem;
+      color: inherit;
+      font-size: 1rem;
+    }
+    body.light .form-group input {
+      background: rgba(0,0,0,0.05);
+    }
+    .forgot-link {
+      text-align: right;
+      margin: 0.5rem 0 1rem;
+    }
+    .forgot-link a {
+      color: var(--accent);
+      font-size: 0.8rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+    /* Dashboard cards */
     .card {
       background: var(--card-bg-dark);
       backdrop-filter: blur(12px);
@@ -252,23 +334,55 @@
     body.light .card {
       background: var(--card-bg-light);
     }
-    .form-group input {
-      background: rgba(0,0,0,0.2);
-      border: 1px solid var(--border-dark);
-      color: inherit;
-      border-radius: 2rem;
-      padding: 0.7rem 1rem;
-      width: 100%;
-    }
-    body.light .form-group input {
-      background: rgba(0,0,0,0.05);
-    }
     .upload-area {
       border: 2px dashed var(--primary);
       border-radius: 1.5rem;
       padding: 2rem;
       text-align: center;
       cursor: pointer;
+      transition: var(--transition);
+    }
+    .upload-area:hover {
+      background: rgba(108,43,217,0.1);
+    }
+    .preview {
+      display: none;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .preview img, .preview video {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+    /* History filters */
+    .history-filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .history-filters select, .history-filters input {
+      background: var(--card-bg-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 2rem;
+      padding: 0.4rem 1rem;
+      color: inherit;
     }
     .history-item {
       display: flex;
@@ -276,8 +390,52 @@
       padding: 0.5rem 0;
       border-bottom: 1px solid var(--border-dark);
     }
+    .history-result {
+      padding: 0.2rem 0.6rem;
+      border-radius: 1rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
     .real-badge { background: rgba(74,222,128,0.2); color: #4ade80; }
     .fake-badge { background: rgba(248,113,113,0.2); color: #f87171; }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      max-width: 90%;
+      max-height: 90%;
+      overflow: auto;
+      padding: 1.5rem;
+      border: 1px solid var(--border-dark);
+    }
+    .modal-close {
+      float: right;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -289,6 +447,21 @@
       z-index: 1000;
       display: none;
       border-left: 4px solid var(--primary);
+    }
+    /* Summary cards for analytics */
+    .summary-cards {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .small-stat {
+      background: var(--card-bg-dark);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      flex: 1;
     }
     @media (max-width: 768px) {
       .hero h1 { font-size: 2.2rem; }
@@ -305,6 +478,7 @@
     <div class="navbar">
       <div class="logo">🔍 DeepGuard AI</div>
       <div class="nav-buttons">
+        <button class="lang-switch" id="langSwitch">🌐 EN</button>
         <button class="btn-outline" id="themeToggle">🌙 Dark</button>
         <button class="btn-primary" id="tryNowBtn">Try Now →</button>
         <button class="btn-outline" id="logoutBtn" style="display: none;">Logout</button>
@@ -322,76 +496,45 @@
         </div>
       </div>
       <div class="stats">
-        <div class="stat-card">
-          <div class="stat-number">MesoNet</div>
-          <div>Model</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">~95%</div>
-          <div>Accuracy</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">Celeb-DF</div>
-          <div>Dataset</div>
-        </div>
+        <div class="stat-card"><div class="stat-number">MesoNet</div><div>Model</div></div>
+        <div class="stat-card"><div class="stat-number">~95%</div><div>Accuracy</div></div>
+        <div class="stat-card"><div class="stat-number">Celeb-DF</div><div>Dataset</div></div>
       </div>
       <div class="how-it-works">
         <h2>How It Works</h2>
         <div class="cards">
-          <div class="info-card">
-            <div class="info-icon">📤</div>
-            <h3>Upload Media</h3>
-            <p>Drop an image or video for analysis</p>
-          </div>
-          <div class="info-card">
-            <div class="info-icon">🧠</div>
-            <h3>AI Analysis</h3>
-            <p>MesoNet model processes the content</p>
-          </div>
-          <div class="info-card">
-            <div class="info-icon">📊</div>
-            <h3>Get Results</h3>
-            <p>View confidence scores and verdict</p>
-          </div>
+          <div class="info-card"><div class="info-icon">📤</div><h3>Upload Media</h3><p>Drop an image or video for analysis</p></div>
+          <div class="info-card"><div class="info-icon">🧠</div><h3>AI Analysis</h3><p>MesoNet model processes the content</p></div>
+          <div class="info-card"><div class="info-icon">📊</div><h3>Get Results</h3><p>View confidence scores and verdict</p></div>
         </div>
       </div>
       <div class="model-info">
-        <div class="model-detail">
-          <h4>ARCHITECTURE</h4>
-          <p><strong>MesoNet</strong><br>Mesoscopic feature analysis CNN</p>
-        </div>
-        <div class="model-detail">
-          <h4>ACCURACY</h4>
-          <p><strong>~95%</strong><br>Validated on benchmark datasets</p>
-        </div>
-        <div class="model-detail">
-          <h4>TRAINING DATA</h4>
-          <p><strong>Celeb-DF</strong><br>High-quality celebrity deepfakes</p>
-        </div>
+        <div class="model-detail"><h4>ARCHITECTURE</h4><p><strong>MesoNet</strong><br>Mesoscopic feature analysis CNN</p></div>
+        <div class="model-detail"><h4>ACCURACY</h4><p><strong>~95%</strong><br>Validated on benchmark datasets</p></div>
+        <div class="model-detail"><h4>TRAINING DATA</h4><p><strong>Celeb-DF</strong><br>High-quality celebrity deepfakes</p></div>
       </div>
-      <footer>
-        DeepGuard © 2026 • Real-time Detection • <span id="learnMoreSpan">Learn more about deepfakes</span>
-      </footer>
+      <footer>DeepGuard © 2026 • Real-time Detection • <span id="learnMoreSpan">Learn more about deepfakes</span></footer>
     </div>
 
     <!-- Authentication Section (Login/Signup) -->
     <div id="authSection" class="section">
-      <div class="card" style="max-width: 500px; margin: 2rem auto;">
-        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+      <div class="auth-card">
+        <div class="tabs">
           <button class="tab-btn active" data-tab="login">Login</button>
           <button class="tab-btn" data-tab="signup">Sign Up</button>
         </div>
         <div id="loginForm" class="auth-form active">
           <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"></div>
           <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+          <div class="forgot-link"><a id="forgotPasswordLink">Forgot Password?</a></div>
           <button class="btn-primary" id="loginBtn" style="width:100%">Login</button>
-          <p style="text-align: center; margin-top: 1rem;">Demo: any email/password</p>
+          <p style="text-align: center; margin-top: 1rem; opacity:0.7;">Demo: any email/password</p>
         </div>
         <div id="signupForm" class="auth-form" style="display:none">
           <div class="form-group"><label>Name</label><input type="text" id="signupName" placeholder="John Doe"></div>
           <div class="form-group"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com"></div>
           <div class="form-group"><label>Password</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
-          <div class="form-group"><label>Confirm</label><input type="password" id="signupConfirm" placeholder="••••••••"></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" id="signupConfirm" placeholder="••••••••"></div>
           <button class="btn-primary" id="signupBtn" style="width:100%">Sign Up</button>
         </div>
       </div>
@@ -399,18 +542,23 @@
 
     <!-- Dashboard (after login) -->
     <div id="dashboardSection" class="section">
+      <!-- Welcome Card -->
       <div class="card">
         <h2>Welcome, <span id="userName"></span>!</h2>
-        <p>Upload an image to detect deepfakes.</p>
+        <p>Upload images or videos to detect deepfakes.</p>
       </div>
+
+      <!-- Image Detection Card -->
       <div class="card">
+        <h3>📷 Image Detection</h3>
         <div class="upload-area" id="uploadArea">
           <div>📸 Drag & drop or click to upload</div>
           <input type="file" id="fileInput" accept="image/*" style="display:none">
         </div>
-        <div class="preview" id="preview" style="display:none; text-align:center; margin:1rem 0"><img id="previewImage" style="max-width:200px; border-radius:1rem"></div>
+        <div class="preview" id="preview"><img id="previewImage" style="cursor:pointer"></div>
+        <div class="progress-bar" id="uploadProgress" style="display:none"><div class="progress-fill"></div></div>
         <button class="btn-primary" id="predictBtn" disabled style="width:100%">Detect Deepfake</button>
-        <div id="loader" style="display:none; text-align:center; margin:1rem">Analyzing...</div>
+        <div id="loader" style="display:none; text-align:center; margin:1rem"><div class="skeleton" style="width:100%; height:2rem; border-radius:1rem"></div></div>
         <div id="resultContainer" style="display:none; text-align:center; margin-top:1rem">
           <div style="position:relative; width:120px; height:120px; margin:0 auto">
             <svg width="120" height="120" viewBox="0 0 120 120">
@@ -420,25 +568,78 @@
             <div id="confidenceText" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.4rem; font-weight:bold"></div>
           </div>
           <h3 id="resultTitle"></h3>
+          <button id="generateReportBtn" class="btn-outline" style="margin-top:0.5rem">📄 Download PDF Report</button>
+          <button id="showDetailsBtn" class="btn-outline" style="margin-top:0.5rem">🔍 Show Details</button>
         </div>
       </div>
+
+      <!-- Video Detection Card -->
+      <div class="card">
+        <h3>🎥 Video Detection</h3>
+        <div class="upload-area" id="videoUploadArea">
+          <div>🎥 Drag & drop video (MP4) or click to upload</div>
+          <input type="file" id="videoFileInput" accept="video/mp4" style="display:none">
+        </div>
+        <div class="preview" id="videoPreview"><video id="videoPlayer" controls style="max-width:100%; max-height:300px"></video></div>
+        <button class="btn-primary" id="analyzeVideoBtn" disabled>Analyze Video</button>
+        <div id="videoResult" style="display:none; margin-top:1rem"></div>
+        <div id="frameResults" style="margin-top:1rem"></div>
+      </div>
+
+      <!-- Analytics Card -->
+      <div class="card">
+        <h3>📊 Analytics Dashboard</h3>
+        <canvas id="analyticsChart" width="400" height="200"></canvas>
+        <div class="summary-cards">
+          <div class="small-stat"><div id="totalUploads">0</div><div>Total Uploads</div></div>
+          <div class="small-stat"><div id="fakeCount">0</div><div>Fake Detected</div></div>
+          <div class="small-stat"><div id="realCount">0</div><div>Real Detected</div></div>
+        </div>
+      </div>
+
+      <!-- Webcam Card -->
+      <div class="card">
+        <h3>📸 Real‑time Webcam Detection</h3>
+        <video id="webcamVideo" autoplay playsinline style="width:100%; max-width:400px; border-radius:1rem; background:#000"></video>
+        <button class="btn-primary" id="captureBtn" style="margin-top:0.5rem">Capture & Detect</button>
+        <div id="webcamResult" style="margin-top:1rem"></div>
+      </div>
+
+      <!-- History Panel -->
       <div class="card">
         <h3>📜 History</h3>
+        <div class="history-filters">
+          <select id="historyFilterType"><option value="all">All</option><option value="REAL">Real only</option><option value="FAKE">Fake only</option></select>
+          <input type="date" id="historyDateFrom" placeholder="From">
+          <input type="date" id="historyDateTo" placeholder="To">
+          <button class="btn-outline" id="applyHistoryFilter">Apply</button>
+        </div>
         <div id="historyList"></div>
         <button class="btn-outline" id="clearHistoryBtn" style="margin-top:1rem">Clear History</button>
       </div>
+
+      <!-- Model Info -->
       <div class="card">
         <h3>🧠 Model Info</h3>
         <p><strong>Architecture:</strong> MesoNet (custom CNN)</p>
         <p><strong>Accuracy:</strong> ~95% on Celeb-DF</p>
+        <p><strong>Input:</strong> 64x64 grayscale face crops</p>
       </div>
+
+      <!-- Admin Panel -->
       <div class="card">
         <h3>⚙️ Admin Panel (Training)</h3>
+        <input type="file" id="datasetUpload" accept=".zip" style="margin-bottom:0.5rem">
         <button class="btn-outline" id="trainBtn">Retrain Model</button>
         <div id="trainLogs" style="font-size:0.8rem; margin-top:1rem"></div>
       </div>
     </div>
   </div>
+
+  <!-- Modals -->
+  <div id="zoomModal" class="modal"><div class="modal-content"><span class="modal-close">&times;</span><img id="zoomImage" style="max-width:100%"></div></div>
+  <div id="detailsModal" class="modal"><div class="modal-content"><span class="modal-close">&times;</span><h3>Detailed Analysis</h3><div id="detailsContent"></div></div></div>
+
   <div id="toast" class="toast"></div>
 
   <script>
@@ -451,14 +652,15 @@
     const learnMoreBtn = document.getElementById('learnMoreBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const themeToggle = document.getElementById('themeToggle');
+    const langSwitch = document.getElementById('langSwitch');
     // Auth elements
     const loginFormDiv = document.getElementById('loginForm');
     const signupFormDiv = document.getElementById('signupForm');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const loginBtn = document.getElementById('loginBtn');
     const signupBtn = document.getElementById('signupBtn');
-    // Dashboard elements
-    const userNameSpan = document.getElementById('userName');
+    const forgotLink = document.getElementById('forgotPasswordLink');
+    // Image detection
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
@@ -469,15 +671,43 @@
     const resultTitle = document.getElementById('resultTitle');
     const confidenceText = document.getElementById('confidenceText');
     const progressCircle = document.getElementById('progressCircle');
+    const generateReportBtn = document.getElementById('generateReportBtn');
+    const showDetailsBtn = document.getElementById('showDetailsBtn');
+    const uploadProgressBar = document.getElementById('uploadProgress');
+    const progressFill = uploadProgressBar.querySelector('.progress-fill');
+    // Video
+    const videoUploadArea = document.getElementById('videoUploadArea');
+    const videoFileInput = document.getElementById('videoFileInput');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const analyzeVideoBtn = document.getElementById('analyzeVideoBtn');
+    const videoResultDiv = document.getElementById('videoResult');
+    const frameResultsDiv = document.getElementById('frameResults');
+    // Analytics
+    let analyticsChart = null;
+    // Webcam
+    const webcamVideo = document.getElementById('webcamVideo');
+    const captureBtn = document.getElementById('captureBtn');
+    const webcamResult = document.getElementById('webcamResult');
+    // History
     const historyList = document.getElementById('historyList');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const historyFilterType = document.getElementById('historyFilterType');
+    const historyDateFrom = document.getElementById('historyDateFrom');
+    const historyDateTo = document.getElementById('historyDateTo');
+    const applyHistoryFilter = document.getElementById('applyHistoryFilter');
+    // Admin
     const trainBtn = document.getElementById('trainBtn');
     const trainLogs = document.getElementById('trainLogs');
+    const datasetUpload = document.getElementById('datasetUpload');
+    // User name span
+    const userNameSpan = document.getElementById('userName');
 
     let selectedFile = null;
     let currentUser = null;
+    let currentPrediction = null;
 
-    // Toast
+    // Helper: show toast
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -486,9 +716,88 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // Auth UI update
+    // User-specific storage
+    function getHistoryKey(email) { return `history_${email}`; }
+    function loadHistoryForUser(email) { const stored = localStorage.getItem(getHistoryKey(email)); return stored ? JSON.parse(stored) : []; }
+    function saveHistoryForUser(email, history) { localStorage.setItem(getHistoryKey(email), JSON.stringify(history)); }
+    function addToHistory(fileName, result, confidence) {
+      if (!currentUser) return;
+      const history = loadHistoryForUser(currentUser.email);
+      history.unshift({ fileName, result, confidence, date: new Date().toISOString() });
+      if (history.length > 20) history.pop();
+      saveHistoryForUser(currentUser.email, history);
+      renderHistory();
+      updateAnalytics();
+    }
+    function clearHistoryForUser() {
+      if (!currentUser) return;
+      saveHistoryForUser(currentUser.email, []);
+      renderHistory();
+      updateAnalytics();
+      showToast('History cleared');
+    }
+    function renderHistory() {
+      if (!currentUser) return;
+      let history = loadHistoryForUser(currentUser.email);
+      const filter = historyFilterType.value;
+      const from = historyDateFrom.value ? new Date(historyDateFrom.value) : null;
+      const to = historyDateTo.value ? new Date(historyDateTo.value) : null;
+      if (filter !== 'all') history = history.filter(item => item.result === filter);
+      if (from) history = history.filter(item => new Date(item.date) >= from);
+      if (to) history = history.filter(item => new Date(item.date) <= new Date(to + 'T23:59:59'));
+      if (!history.length) { historyList.innerHTML = '<p>No history yet.</p>'; return; }
+      historyList.innerHTML = history.map(item => `
+        <div class="history-item">
+          <div><strong>${item.fileName}</strong><br><small>${new Date(item.date).toLocaleString()}</small></div>
+          <div><span class="history-result ${item.result === 'REAL' ? 'real-badge' : 'fake-badge'}">${item.result}</span><br>${(item.confidence*100).toFixed(1)}%</div>
+        </div>
+      `).join('');
+    }
+    function updateAnalytics() {
+      if (!currentUser) return;
+      const history = loadHistoryForUser(currentUser.email);
+      const total = history.length;
+      const fake = history.filter(h => h.result === 'FAKE').length;
+      const real = total - fake;
+      document.getElementById('totalUploads').innerText = total;
+      document.getElementById('fakeCount').innerText = fake;
+      document.getElementById('realCount').innerText = real;
+      if (analyticsChart) {
+        analyticsChart.data.datasets[0].data = [real, fake];
+        analyticsChart.update();
+      }
+    }
+
+    // Auth
+    function login(email, password) {
+      if (!email || !password) { showToast('Please enter email and password', true); return false; }
+      const name = email.split('@')[0];
+      const user = { name, email };
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      currentUser = user;
+      updateAuthUI();
+      showToast('Login successful!');
+      return true;
+    }
+    function signup(name, email, password, confirm) {
+      if (!name || !email || !password || !confirm) { showToast('All fields required', true); return false; }
+      if (password !== confirm) { showToast('Passwords do not match', true); return false; }
+      if (!email.includes('@')) { showToast('Invalid email', true); return false; }
+      const user = { name, email };
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      currentUser = user;
+      updateAuthUI();
+      showToast('Account created!');
+      return true;
+    }
+    function logout() {
+      localStorage.removeItem('currentUser');
+      currentUser = null;
+      updateAuthUI();
+      showToast('Logged out');
+    }
     function updateAuthUI() {
-      const stored = localStorage.getItem('user');
+      const stored = localStorage.getItem('currentUser');
       if (stored) {
         currentUser = JSON.parse(stored);
         userNameSpan.textContent = currentUser.name;
@@ -496,59 +805,36 @@
         authSection.classList.remove('active');
         dashboardSection.classList.add('active');
         logoutBtn.style.display = 'block';
-        loadHistory();
+        resetDashboardUI();
+        renderHistory();
+        updateAnalytics();
+        initChart();
+        initWebcam();
       } else {
         currentUser = null;
         landingSection.classList.add('active');
         authSection.classList.remove('active');
         dashboardSection.classList.remove('active');
         logoutBtn.style.display = 'none';
+        resetDashboardUI();
       }
     }
-
-    function login(email, pass) {
-      if (!email || !pass) { showToast('Enter email/password', true); return false; }
-      const user = { name: email.split('@')[0], email };
-      localStorage.setItem('user', JSON.stringify(user));
-      updateAuthUI();
-      showToast('Logged in');
-      return true;
+    function resetDashboardUI() {
+      selectedFile = null;
+      preview.style.display = 'none';
+      previewImage.src = '';
+      predictBtn.disabled = true;
+      resultContainer.style.display = 'none';
+      loader.style.display = 'none';
+      fileInput.value = '';
+      videoPreview.style.display = 'none';
+      videoPlayer.src = '';
+      analyzeVideoBtn.disabled = true;
+      videoResultDiv.innerHTML = '';
+      frameResultsDiv.innerHTML = '';
+      webcamResult.innerHTML = '';
+      currentPrediction = null; // Clear saved prediction
     }
-    function signup(name, email, pass, confirm) {
-      if (!name || !email || !pass || !confirm) { showToast('All fields required', true); return false; }
-      if (pass !== confirm) { showToast('Passwords do not match', true); return false; }
-      if (!email.includes('@')) { showToast('Invalid email', true); return false; }
-      const user = { name, email };
-      localStorage.setItem('user', JSON.stringify(user));
-      updateAuthUI();
-      showToast('Account created!');
-      return true;
-    }
-    function logout() {
-      localStorage.removeItem('user');
-      updateAuthUI();
-      showToast('Logged out');
-    }
-
-    // History
-    function addToHistory(fileName, result, confidence) {
-      const hist = JSON.parse(localStorage.getItem('history') || '[]');
-      hist.unshift({ fileName, result, confidence, date: new Date().toLocaleString() });
-      if (hist.length > 20) hist.pop();
-      localStorage.setItem('history', JSON.stringify(hist));
-      loadHistory();
-    }
-    function loadHistory() {
-      const hist = JSON.parse(localStorage.getItem('history') || '[]');
-      if (!hist.length) { historyList.innerHTML = '<p>No history yet.</p>'; return; }
-      historyList.innerHTML = hist.map(item => `
-        <div class="history-item">
-          <div><strong>${item.fileName}</strong><br><small>${item.date}</small></div>
-          <div><span class="history-result ${item.result === 'REAL' ? 'real-badge' : 'fake-badge'}">${item.result}</span><br>${(item.confidence*100).toFixed(1)}%</div>
-        </div>
-      `).join('');
-    }
-    function clearHistory() { localStorage.removeItem('history'); loadHistory(); showToast('History cleared'); }
 
     // Prediction
     async function predict(file) {
@@ -564,21 +850,31 @@
       resultTitle.textContent = result === 'REAL' ? '✅ REAL IMAGE' : '❌ DEEPFAKE DETECTED';
       resultTitle.style.color = isReal ? '#4ade80' : '#f87171';
       confidenceText.textContent = `${(confidence*100).toFixed(1)}%`;
-      const circumference = 314; // 2*pi*50
+      const circumference = 314;
       const offset = circumference * (1 - confidence);
       progressCircle.style.stroke = isReal ? '#4ade80' : '#f87171';
       progressCircle.style.strokeDashoffset = offset;
       resultContainer.style.display = 'block';
+      currentPrediction = { isReal, confidence, fileName: selectedFile?.name };
     }
     async function handlePrediction() {
       if (!selectedFile) return;
       predictBtn.disabled = true;
       loader.style.display = 'block';
+      uploadProgressBar.style.display = 'block';
+      progressFill.style.width = '0%';
+      let progress = 0;
+      const interval = setInterval(() => { if (progress < 90) { progress += 10; progressFill.style.width = progress+'%'; } }, 100);
       try {
         const result = await predict(selectedFile);
+        clearInterval(interval);
+        progressFill.style.width = '100%';
+        setTimeout(() => uploadProgressBar.style.display = 'none', 500);
         updateResultUI(result.is_real, result.confidence);
         addToHistory(selectedFile.name, result.is_real ? 'REAL' : 'FAKE', result.confidence);
       } catch (err) {
+        clearInterval(interval);
+        uploadProgressBar.style.display = 'none';
         showToast(err.message, true);
       } finally {
         predictBtn.disabled = false;
@@ -586,6 +882,8 @@
       }
     }
     function handleFile(file) {
+      if (!file.type.startsWith('image/')) { showToast('Please upload an image', true); return; }
+      if (file.size > 100 * 1024 * 1024) { showToast('File too large (max 100MB)', true); return; }
       selectedFile = file;
       const reader = new FileReader();
       reader.onload = e => {
@@ -593,88 +891,204 @@
         preview.style.display = 'block';
         predictBtn.disabled = false;
         resultContainer.style.display = 'none';
+        currentPrediction = null; // clear old result
       };
       reader.readAsDataURL(file);
     }
 
-    // Training mock
+    // Video handling (simulated)
+    function handleVideo(file) {
+      if (!file.type.startsWith('video/')) { showToast('Please upload a video', true); return; }
+      if (file.size > 100 * 1024 * 1024) { showToast('File too large (max 100MB)', true); return; }
+      const url = URL.createObjectURL(file);
+      videoPlayer.src = url;
+      videoPreview.style.display = 'block';
+      analyzeVideoBtn.disabled = false;
+    }
+    async function analyzeVideo() {
+      analyzeVideoBtn.disabled = true;
+      videoResultDiv.style.display = 'block';
+      videoResultDiv.innerHTML = 'Analyzing video frames...';
+      setTimeout(() => {
+        videoResultDiv.innerHTML = '<span style="color:#4ade80">✅ Analysis complete (simulated)</span><br>Fake probability: 87%<br>Real frames: 12 / 100';
+        frameResultsDiv.innerHTML = '<p>Frame results: Frame 15, 42, 78 flagged as fake.</p><input type="range" min="0" max="99" value="0" style="width:100%">';
+        showToast('Video analysis completed (demo)', false);
+        analyzeVideoBtn.disabled = false;
+      }, 2000);
+    }
+
+    // Report generation
+    function generateReport() {
+  if (!currentPrediction) {
+    showToast('No prediction available. Please detect an image first.', true);
+    return;
+  }
+  // Create a temporary container (hidden off-screen)
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '-9999px';
+  container.style.width = '800px';
+  container.style.background = 'white';
+  container.style.padding = '2rem';
+  container.style.fontFamily = 'sans-serif';
+  container.innerHTML = `
+    <h1 style="color:#6c2bd9;">Deepfake Detection Report</h1>
+    <p><strong>File:</strong> ${currentPrediction.fileName}</p>
+    <p><strong>Result:</strong> ${currentPrediction.isReal ? 'REAL' : 'FAKE'}</p>
+    <p><strong>Confidence:</strong> ${(currentPrediction.confidence*100).toFixed(1)}%</p>
+    <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+    <p><strong>Model:</strong> MesoNet (accuracy ~95%)</p>
+    <p><strong>Explanation:</strong> The model analyzes mesoscopic features of faces to detect manipulation artifacts.</p>
+  `;
+  document.body.appendChild(container);
+
+  // Generate PDF
+  html2pdf()
+    .from(container)
+    .set({ margin: 0.5, filename: 'deepfake_report.pdf' })
+    .save()
+    .then(() => {
+      document.body.removeChild(container);
+    })
+    .catch(err => {
+      console.error(err);
+      document.body.removeChild(container);
+      showToast('Failed to generate PDF', true);
+    });
+}
+
+    // Details modal
+    function showDetails() {
+      if (!currentPrediction) {
+        showToast('No prediction available. Please detect an image first.', true);
+        return;
+      }
+      const details = `
+        <p><strong>File:</strong> ${currentPrediction.fileName}</p>
+        <p><strong>Verdict:</strong> ${currentPrediction.isReal ? 'REAL' : 'FAKE'}</p>
+        <p><strong>Confidence:</strong> ${(currentPrediction.confidence*100).toFixed(1)}%</p>
+        <p><strong>Processing time:</strong> ~1.2 seconds</p>
+        <p><strong>Model:</strong> MesoNet (trained on Celeb-DF)</p>
+        <p><strong>Explanation:</strong> The model analyzes mesoscopic features of faces to detect manipulation artifacts.</p>
+      `;
+      document.getElementById('detailsContent').innerHTML = details;
+      document.getElementById('detailsModal').style.display = 'flex';
+    }
+
+    // Analytics chart
+    function initChart() {
+      const ctx = document.getElementById('analyticsChart').getContext('2d');
+      if (analyticsChart) analyticsChart.destroy();
+      analyticsChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: ['Real', 'Fake'], datasets: [{ label: 'Detections', data: [0,0], backgroundColor: ['#4ade80', '#f87171'] }] },
+        options: { responsive: true, maintainAspectRatio: true }
+      });
+      updateAnalytics();
+    }
+
+    // Webcam simulation
+    async function initWebcam() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        webcamVideo.srcObject = stream;
+      } catch (err) { console.warn('Webcam not available', err); }
+    }
+    async function captureAndDetect() {
+      if (!webcamVideo.srcObject) { showToast('Webcam not available', true); return; }
+      const canvas = document.createElement('canvas');
+      canvas.width = webcamVideo.videoWidth;
+      canvas.height = webcamVideo.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(webcamVideo, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/jpeg');
+      const blob = await (await fetch(dataURL)).blob();
+      const file = new File([blob], 'webcam.jpg', { type: 'image/jpeg' });
+      handleFile(file);
+      selectedFile = file;
+      await handlePrediction();
+    }
+
+    // Language switcher (mock)
+    let currentLang = 'en';
+    function toggleLang() {
+      currentLang = currentLang === 'en' ? 'es' : 'en';
+      langSwitch.innerText = currentLang === 'en' ? '🌐 EN' : '🌐 ES';
+      showToast(`Language switched to ${currentLang === 'en' ? 'English' : 'Spanish (demo)'}`, false);
+    }
+
+    // Admin training mock
     async function trainModel() {
+      if (datasetUpload.files.length === 0) { showToast('Please select a dataset ZIP file', true); return; }
       trainLogs.innerHTML = 'Training started...';
       try {
-        const res = await fetch('/api/train', { method: 'POST' });
+        const formData = new FormData();
+        formData.append('dataset', datasetUpload.files[0]);
+        const res = await fetch('/api/train', { method: 'POST', body: formData });
         const data = await res.json();
         trainLogs.innerHTML = `Training completed: ${data.message || 'Model updated'}`;
         showToast('Training completed');
       } catch {
-        trainLogs.innerHTML = 'Training endpoint not implemented';
+        trainLogs.innerHTML = 'Training endpoint not implemented (simulated)';
         showToast('Training endpoint not ready', true);
       }
     }
 
-    // Theme
-    function initTheme() {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'light') {
-        document.body.classList.add('light');
-        themeToggle.textContent = '🌞 Light';
-      } else {
-        document.body.classList.remove('light');
-        themeToggle.textContent = '🌙 Dark';
-      }
-    }
-    function toggleTheme() {
-      if (document.body.classList.contains('light')) {
-        document.body.classList.remove('light');
-        localStorage.setItem('theme', 'dark');
-        themeToggle.textContent = '🌙 Dark';
-      } else {
-        document.body.classList.add('light');
-        localStorage.setItem('theme', 'light');
-        themeToggle.textContent = '🌞 Light';
-      }
-    }
+    // Modal close
+    document.querySelectorAll('.modal-close').forEach(el => {
+      el.addEventListener('click', () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); });
+    });
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) event.target.style.display = 'none';
+    };
 
     // Event listeners
     tryNowBtn.addEventListener('click', () => { authSection.classList.add('active'); landingSection.classList.remove('active'); });
     landingTryBtn.addEventListener('click', () => { authSection.classList.add('active'); landingSection.classList.remove('active'); });
     learnMoreBtn.addEventListener('click', () => { window.scrollTo({ top: document.querySelector('.how-it-works').offsetTop, behavior: 'smooth' }); });
     logoutBtn.addEventListener('click', logout);
-    themeToggle.addEventListener('click', toggleTheme);
+    themeToggle.addEventListener('click', () => { document.body.classList.toggle('light'); themeToggle.textContent = document.body.classList.contains('light') ? '🌞 Light' : '🌙 Dark'; localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark'); });
+    langSwitch.addEventListener('click', toggleLang);
     // Auth tabs
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         tabBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const target = btn.dataset.tab;
-        if (target === 'login') {
-          loginFormDiv.style.display = 'block';
-          signupFormDiv.style.display = 'none';
-        } else {
-          loginFormDiv.style.display = 'none';
-          signupFormDiv.style.display = 'block';
-        }
+        if (target === 'login') { loginFormDiv.style.display = 'block'; signupFormDiv.style.display = 'none'; }
+        else { loginFormDiv.style.display = 'none'; signupFormDiv.style.display = 'block'; }
       });
     });
     loginBtn.addEventListener('click', () => login(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value));
     signupBtn.addEventListener('click', () => signup(document.getElementById('signupName').value, document.getElementById('signupEmail').value, document.getElementById('signupPassword').value, document.getElementById('signupConfirm').value));
-    // Upload
+    forgotLink.addEventListener('click', () => showToast('Password reset link sent to your email (demo)', false));
+    // Image upload
     uploadArea.addEventListener('click', () => fileInput.click());
     uploadArea.addEventListener('dragover', e => e.preventDefault());
-    uploadArea.addEventListener('drop', e => {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) handleFile(file);
-      else showToast('Please drop an image', true);
-    });
+    uploadArea.addEventListener('drop', e => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file && file.type.startsWith('image/')) handleFile(file); else showToast('Please drop an image', true); });
     fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
     predictBtn.addEventListener('click', handlePrediction);
-    clearHistoryBtn.addEventListener('click', clearHistory);
+    generateReportBtn.addEventListener('click', generateReport);
+    showDetailsBtn.addEventListener('click', showDetails);
+    previewImage.addEventListener('click', () => { document.getElementById('zoomImage').src = previewImage.src; document.getElementById('zoomModal').style.display = 'flex'; });
+    // Video
+    videoUploadArea.addEventListener('click', () => videoFileInput.click());
+    videoUploadArea.addEventListener('dragover', e => e.preventDefault());
+    videoUploadArea.addEventListener('drop', e => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file && file.type.startsWith('video/')) handleVideo(file); else showToast('Please drop a video', true); });
+    videoFileInput.addEventListener('change', e => { if (e.target.files[0]) handleVideo(e.target.files[0]); });
+    analyzeVideoBtn.addEventListener('click', analyzeVideo);
+    // History filters
+    applyHistoryFilter.addEventListener('click', renderHistory);
+    clearHistoryBtn.addEventListener('click', () => { if (confirm('Clear all history?')) clearHistoryForUser(); });
+    // Admin
     trainBtn.addEventListener('click', trainModel);
+    // Webcam
+    captureBtn.addEventListener('click', captureAndDetect);
 
-    // Initialize
-    initTheme();
+    // Theme init
+    if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
     updateAuthUI();
-    // Prefill login for demo
     document.getElementById('loginEmail').value = 'demo@example.com';
     document.getElementById('loginPassword').value = 'demo';
   </script>
