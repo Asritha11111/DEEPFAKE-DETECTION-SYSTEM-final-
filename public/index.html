@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>DeepGuard AI | Deepfake Detector</title>
+  <title>Deepvora AI | Deepfake Detector</title>
   <!-- External Libraries -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
-    /* ----- VIBRANT CSS VARIABLES (unchanged) ----- */
+    /* ----- CSS VARIABLES ----- */
     :root {
       --bg-dark: #0a0a1a;
       --bg-light: #f4f4fc;
@@ -86,6 +86,7 @@
       display: flex;
       gap: 1rem;
       align-items: center;
+      flex-wrap: wrap;
     }
     .btn-outline {
       background: transparent;
@@ -105,10 +106,11 @@
     .btn-primary {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       border: none;
-      padding: 0.5rem 1.5rem;
+      padding: 0.8rem 2rem;
       border-radius: 3rem;
       color: white;
       font-weight: 600;
+      font-size: 1.1rem;
       cursor: pointer;
       transition: var(--transition);
     }
@@ -116,14 +118,22 @@
       transform: scale(1.05);
       box-shadow: 0 0 20px rgba(108,43,217,0.8);
     }
-    /* Language switcher */
-    .lang-switch {
+    /* Language dropdown */
+    .lang-select {
       background: transparent;
       border: 1px solid var(--border-dark);
       border-radius: 2rem;
       padding: 0.4rem 1rem;
-      cursor: pointer;
       color: inherit;
+      cursor: pointer;
+    }
+    .lang-select option {
+      background-color: #2d2d3a;
+      color: #fff;
+    }
+    body.light .lang-select option {
+      background-color: #fff;
+      color: #000;
     }
     /* Hero Section */
     .hero {
@@ -254,7 +264,7 @@
     .section.active {
       display: block;
     }
-    /* Auth Card (Improved) */
+    /* Auth Card */
     .auth-card {
       max-width: 500px;
       margin: 2rem auto;
@@ -420,6 +430,13 @@
       padding: 1.5rem;
       border: 1px solid var(--border-dark);
     }
+    body.light .modal-content {
+      color: var(--text-dark);
+      background: var(--card-bg-light);
+    }
+    body:not(.light) .modal-content {
+      color: var(--text-light);
+    }
     .modal-close {
       float: right;
       cursor: pointer;
@@ -435,18 +452,96 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    /* Toast */
+    /* Toast notification */
     .toast {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: var(--card-bg-dark);
-      backdrop-filter: blur(8px);
-      padding: 1rem 1.5rem;
-      border-radius: 1rem;
+      min-width: 280px;
+      max-width: 350px;
+      background: #1e1e2f;
+      backdrop-filter: blur(12px);
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       z-index: 1000;
       display: none;
-      border-left: 4px solid var(--primary);
+      overflow: hidden;
+      animation: slideInUp 0.3s ease forwards;
+    }
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    .toast-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .toast-message {
+      flex: 1;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: #ffffff;
+    }
+    .toast-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0 4px;
+      transition: color 0.2s;
+    }
+    .toast-close:hover {
+      color: white;
+    }
+    /* Error toast */
+    .toast.error {
+      background: #ffe5e5;
+      border-left: 4px solid #ff4d4f;
+    }
+    .toast.error .toast-message {
+      color: #b91c1c;
+    }
+    .toast.error .toast-icon {
+      color: #ff4d4f;
+    }
+    .toast.error .toast-close {
+      color: #b91c1c;
+    }
+    /* Success toast */
+    .toast.success {
+      background: #e6ffed;
+      border-left: 4px solid #4ade80;
+    }
+    .toast.success .toast-message {
+      color: #166534;
+    }
+    .toast.success .toast-icon {
+      color: #4ade80;
+    }
+    .toast.success .toast-close {
+      color: #166534;
+    }
+    /* Light theme adjustment for default toast */
+    body.light .toast:not(.error):not(.success) {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+    }
+    body.light .toast:not(.error):not(.success) .toast-message {
+      color: #1f2937;
     }
     /* Summary cards for analytics */
     .summary-cards {
@@ -463,10 +558,113 @@
       text-align: center;
       flex: 1;
     }
+    /* Analytics charts */
+    .analytics-charts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .chart-box {
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+    #pieChart {
+      max-width: 200px;
+      max-height: 200px;
+      margin: 0 auto;
+    }
+    /* Profile specific improvements */
+    .profile-card .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-dark);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .profile-card .info-label {
+      font-weight: 600;
+      min-width: 80px;
+      opacity: 0.9;
+    }
+    .profile-card .info-value {
+      flex: 1;
+      text-align: left;
+      word-break: break-word;
+    }
+    .profile-card .edit-name-container {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .profile-card .edit-name-input {
+      background: #ffffff !important;
+      color: #000000 !important;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    body.light .profile-card .edit-name-input {
+      background: #ffffff;
+      color: #000000;
+    }
+    .profile-card .edit-buttons {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+    .profile-card .edit-buttons button {
+      padding: 0.4rem 1.2rem;
+      font-size: 0.9rem;
+      border-radius: 2rem;
+      cursor: pointer;
+    }
+    .stat-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+    .stat-badge {
+      background: rgba(108,43,217,0.2);
+      border-radius: 1rem;
+      padding: 0.75rem;
+      text-align: center;
+      flex: 1;
+    }
+    .recent-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
     @media (max-width: 768px) {
       .hero h1 { font-size: 2.2rem; }
       .stats { gap: 1rem; }
       .stat-card { width: 140px; }
+      .profile-card .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .profile-card .info-label {
+        min-width: auto;
+      }
+      .profile-card .info-value {
+        width: 100%;
+      }
+      .profile-card .edit-buttons {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -476,88 +674,98 @@
   <div class="container">
     <!-- Navbar -->
     <div class="navbar">
-      <div class="logo">🔍 DeepGuard AI</div>
+      <div class="logo">🔍 Deepvora AI</div>
       <div class="nav-buttons">
-        <button class="lang-switch" id="langSwitch">🌐 EN</button>
+        <select id="langSelect" class="lang-select">
+          <option value="en">🌐 English</option>
+          <option value="es">🌐 Español</option>
+          <option value="hi">🌐 हिन्दी</option>
+          <option value="fr">🌐 Français</option>
+        </select>
         <button class="btn-outline" id="themeToggle">🌙 Dark</button>
+        <button class="btn-outline" id="profileNavBtn" style="display: none;">👤 Profile</button>
+        <button class="btn-outline" id="dashboardNavBtn" style="display: none;">🏠 Dashboard</button>
         <button class="btn-primary" id="tryNowBtn">Try Now →</button>
         <button class="btn-outline" id="logoutBtn" style="display: none;">Logout</button>
       </div>
     </div>
 
-    <!-- Landing Page (visible when not logged in) -->
+    <!-- Landing Page -->
     <div id="landingSection" class="section active">
       <div class="hero">
-        <h1>AI-Powered Detection</h1>
-        <p>Detect manipulated media with state-of-the-art AI. Upload images or videos and get instant analysis powered by the MesoNet architecture.</p>
+        <h1 data-i18n="hero_title">AI-Powered Detection</h1>
+        <p data-i18n="hero_desc">Detect manipulated media with state-of-the-art AI. Upload images or videos and get instant analysis powered by the MesoNet architecture.</p>
         <div class="cta-buttons">
-          <button class="btn-primary" id="landingTryBtn">Try Now →</button>
-          <button class="btn-outline" id="learnMoreBtn">Learn More</button>
+          <button class="btn-primary" id="landingTryBtn" data-i18n="try_now_btn">Try Now →</button>
+          <button class="btn-outline" id="learnMoreBtn" data-i18n="learn_more_btn">Learn More</button>
         </div>
       </div>
       <div class="stats">
-        <div class="stat-card"><div class="stat-number">MesoNet</div><div>Model</div></div>
-        <div class="stat-card"><div class="stat-number">~95%</div><div>Accuracy</div></div>
-        <div class="stat-card"><div class="stat-number">Celeb-DF</div><div>Dataset</div></div>
+        <div class="stat-card"><div class="stat-number">MesoNet</div><div data-i18n="model_label">Model</div></div>
+        <div class="stat-card"><div class="stat-number">~95%</div><div data-i18n="accuracy_label">Accuracy</div></div>
+        <div class="stat-card"><div class="stat-number">Celeb-DF</div><div data-i18n="dataset_label">Dataset</div></div>
       </div>
       <div class="how-it-works">
-        <h2>How It Works</h2>
+        <h2 data-i18n="how_it_works_title">How It Works</h2>
         <div class="cards">
-          <div class="info-card"><div class="info-icon">📤</div><h3>Upload Media</h3><p>Drop an image or video for analysis</p></div>
-          <div class="info-card"><div class="info-icon">🧠</div><h3>AI Analysis</h3><p>MesoNet model processes the content</p></div>
-          <div class="info-card"><div class="info-icon">📊</div><h3>Get Results</h3><p>View confidence scores and verdict</p></div>
+          <div class="info-card"><div class="info-icon">📤</div><h3 data-i18n="upload_step_title">Upload Media</h3><p data-i18n="upload_step_desc">Drop an image or video for analysis</p></div>
+          <div class="info-card"><div class="info-icon">🧠</div><h3 data-i18n="ai_step_title">AI Analysis</h3><p data-i18n="ai_step_desc">MesoNet model processes the content</p></div>
+          <div class="info-card"><div class="info-icon">📊</div><h3 data-i18n="result_step_title">Get Results</h3><p data-i18n="result_step_desc">View confidence scores and verdict</p></div>
         </div>
       </div>
       <div class="model-info">
-        <div class="model-detail"><h4>ARCHITECTURE</h4><p><strong>MesoNet</strong><br>Mesoscopic feature analysis CNN</p></div>
-        <div class="model-detail"><h4>ACCURACY</h4><p><strong>~95%</strong><br>Validated on benchmark datasets</p></div>
-        <div class="model-detail"><h4>TRAINING DATA</h4><p><strong>Celeb-DF</strong><br>High-quality celebrity deepfakes</p></div>
+        <div class="model-detail"><h4 data-i18n="architecture_label">ARCHITECTURE</h4><p><strong>MesoNet</strong><br data-i18n="arch_desc">Mesoscopic feature analysis CNN</p></div>
+        <div class="model-detail"><h4 data-i18n="accuracy_detail_label">ACCURACY</h4><p><strong>~95%</strong><br data-i18n="accuracy_desc">Validated on benchmark datasets</p></div>
+        <div class="model-detail"><h4 data-i18n="training_data_label">TRAINING DATA</h4><p><strong>Celeb-DF</strong><br data-i18n="training_desc">High-quality celebrity deepfakes</p></div>
       </div>
-      <footer>DeepGuard © 2026 • Real-time Detection • <span id="learnMoreSpan">Learn more about deepfakes</span></footer>
+      <footer>Deepvora © 2026 • <span data-i18n="realtime_label">Real-time Detection</span> • <span id="learnMoreSpan" data-i18n="learn_more_link">Learn more about deepfakes</span></footer>
     </div>
 
-    <!-- Authentication Section (Login/Signup) -->
+    <!-- Authentication Section -->
     <div id="authSection" class="section">
       <div class="auth-card">
         <div class="tabs">
-          <button class="tab-btn active" data-tab="login">Login</button>
-          <button class="tab-btn" data-tab="signup">Sign Up</button>
+          <button class="tab-btn active" data-tab="login" data-i18n="login_tab">Login</button>
+          <button class="tab-btn" data-tab="signup" data-i18n="signup_tab">Sign Up</button>
         </div>
         <div id="loginForm" class="auth-form active">
-          <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"></div>
-          <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
-          <div class="forgot-link"><a id="forgotPasswordLink">Forgot Password?</a></div>
-          <button class="btn-primary" id="loginBtn" style="width:100%">Login</button>
-          <p style="text-align: center; margin-top: 1rem; opacity:0.7;">Demo: any email/password</p>
+          <div class="form-group"><label data-i18n="email_label">Email</label><input type="email" id="loginEmail" placeholder="you@example.com"></div>
+          <div class="form-group"><label data-i18n="password_label">Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+          <div class="forgot-link"><a id="forgotPasswordLink" data-i18n="forgot_password_link">Forgot Password?</a></div>
+          <button class="btn-primary" id="loginBtn" style="width:100%" data-i18n="login_btn">Login</button>
+          <p style="text-align: center; margin-top: 1rem; opacity:0.7;" data-i18n="demo_note">Demo: any email/password</p>
         </div>
         <div id="signupForm" class="auth-form" style="display:none">
-          <div class="form-group"><label>Name</label><input type="text" id="signupName" placeholder="John Doe"></div>
-          <div class="form-group"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com"></div>
-          <div class="form-group"><label>Password</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
-          <div class="form-group"><label>Confirm Password</label><input type="password" id="signupConfirm" placeholder="••••••••"></div>
-          <button class="btn-primary" id="signupBtn" style="width:100%">Sign Up</button>
+          <div class="form-group"><label data-i18n="name_label">Name</label><input type="text" id="signupName" placeholder="John Doe"></div>
+          <div class="form-group"><label data-i18n="email_label">Email</label><input type="email" id="signupEmail" placeholder="you@example.com"></div>
+          <div class="form-group"><label data-i18n="password_label">Password</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
+          <div class="form-group"><label data-i18n="confirm_password_label">Confirm Password</label><input type="password" id="signupConfirm" placeholder="••••••••"></div>
+          <button class="btn-primary" id="signupBtn" style="width:100%" data-i18n="signup_btn">Sign Up</button>
+        </div>
+        <!-- Back to Home button -->
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button class="btn-outline" id="authHomeBtn">🏠 Back to Home</button>
         </div>
       </div>
     </div>
 
-    <!-- Dashboard (after login) -->
+    <!-- Dashboard -->
     <div id="dashboardSection" class="section">
-      <!-- Welcome Card -->
       <div class="card">
-        <h2>Welcome, <span id="userName"></span>!</h2>
-        <p>Upload images or videos to detect deepfakes.</p>
+        <h2><span data-i18n="welcome_text">Welcome</span>, <span id="userName"></span>!</h2>
+        <p data-i18n="upload_prompt">Upload images or videos to detect deepfakes.</p>
       </div>
 
       <!-- Image Detection Card -->
       <div class="card">
-        <h3>📷 Image Detection</h3>
+        <h3 data-i18n="image_detection_title">📷 Image Detection</h3>
         <div class="upload-area" id="uploadArea">
-          <div>📸 Drag & drop or click to upload</div>
+          <div data-i18n="drag_drop_image">📸 Drag & drop or click to upload</div>
           <input type="file" id="fileInput" accept="image/*" style="display:none">
         </div>
         <div class="preview" id="preview"><img id="previewImage" style="cursor:pointer"></div>
         <div class="progress-bar" id="uploadProgress" style="display:none"><div class="progress-fill"></div></div>
-        <button class="btn-primary" id="predictBtn" disabled style="width:100%">Detect Deepfake</button>
+        <button class="btn-primary" id="predictBtn" disabled style="width:100%" data-i18n="detect_btn">Detect Deepfake</button>
         <div id="loader" style="display:none; text-align:center; margin:1rem"><div class="skeleton" style="width:100%; height:2rem; border-radius:1rem"></div></div>
         <div id="resultContainer" style="display:none; text-align:center; margin-top:1rem">
           <div style="position:relative; width:120px; height:120px; margin:0 auto">
@@ -568,99 +776,458 @@
             <div id="confidenceText" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.4rem; font-weight:bold"></div>
           </div>
           <h3 id="resultTitle"></h3>
-          <button id="generateReportBtn" class="btn-outline" style="margin-top:0.5rem">📄 Download PDF Report</button>
-          <button id="showDetailsBtn" class="btn-outline" style="margin-top:0.5rem">🔍 Show Details</button>
+          <button id="generateReportBtn" class="btn-outline" style="margin-top:0.5rem" data-i18n="download_pdf_btn">📄 Download PDF Report</button>
+          <button id="showDetailsBtn" class="btn-outline" style="margin-top:0.5rem" data-i18n="show_details_btn">🔍 Show Details</button>
         </div>
       </div>
 
       <!-- Video Detection Card -->
       <div class="card">
-        <h3>🎥 Video Detection</h3>
+        <h3 data-i18n="video_detection_title">🎥 Video Detection</h3>
         <div class="upload-area" id="videoUploadArea">
-          <div>🎥 Drag & drop video (MP4) or click to upload</div>
+          <div data-i18n="drag_drop_video">🎥 Drag & drop video (MP4) or click to upload</div>
           <input type="file" id="videoFileInput" accept="video/mp4" style="display:none">
         </div>
         <div class="preview" id="videoPreview"><video id="videoPlayer" controls style="max-width:100%; max-height:300px"></video></div>
-        <button class="btn-primary" id="analyzeVideoBtn" disabled>Analyze Video</button>
+        <button class="btn-primary" id="analyzeVideoBtn" disabled data-i18n="analyze_video_btn">Analyze Video</button>
         <div id="videoResult" style="display:none; margin-top:1rem"></div>
         <div id="frameResults" style="margin-top:1rem"></div>
       </div>
-
-      <!-- Analytics Card -->
+      <!-- Audio Detection Card -->
       <div class="card">
-        <h3>📊 Analytics Dashboard</h3>
-        <canvas id="analyticsChart" width="400" height="200"></canvas>
+        <h3 data-i18n="audio_detection_title">🎤 Audio Detection</h3>
+        <div class="upload-area" id="audioUploadArea">
+          <div data-i18n="drag_drop_audio">🎵 Drag & drop audio (MP3, WAV) or click to upload</div>
+          <input type="file" id="audioFileInput" accept="audio/*" style="display:none">
+        </div>
+        <div class="preview" id="audioPreview" style="display:none">
+          <audio id="audioPlayer" controls style="width:100%"></audio>
+        </div>
+        <button class="btn-primary" id="analyzeAudioBtn" disabled data-i18n="analyze_audio_btn">Analyze Audio</button>
+        <div id="audioResult" style="display:none; margin-top:1rem"></div>
+      </div>
+
+      <!-- Analytics Dashboard -->
+      <div class="card">
+        <h3 data-i18n="analytics_title">📊 Analytics Dashboard</h3>
         <div class="summary-cards">
-          <div class="small-stat"><div id="totalUploads">0</div><div>Total Uploads</div></div>
-          <div class="small-stat"><div id="fakeCount">0</div><div>Fake Detected</div></div>
-          <div class="small-stat"><div id="realCount">0</div><div>Real Detected</div></div>
+          <div class="small-stat"><div id="totalUploads">0</div><div data-i18n="total_uploads_label">Total Uploads</div></div>
+          <div class="small-stat"><div id="fakeCount">0</div><div data-i18n="fake_detected_label">Fake Detected</div></div>
+          <div class="small-stat"><div id="realCount">0</div><div data-i18n="real_detected_label">Real Detected</div></div>
+        </div>
+        <div class="analytics-charts">
+          <div class="chart-box"><canvas id="barChart" width="300" height="200"></canvas></div>
+          <div class="chart-box"><canvas id="pieChart" width="200" height="200"></canvas></div>
         </div>
       </div>
 
       <!-- Webcam Card -->
       <div class="card">
-        <h3>📸 Real‑time Webcam Detection</h3>
+        <h3 data-i18n="webcam_title">📸 Real‑time Webcam Detection</h3>
         <video id="webcamVideo" autoplay playsinline style="width:100%; max-width:400px; border-radius:1rem; background:#000"></video>
-        <button class="btn-primary" id="captureBtn" style="margin-top:0.5rem">Capture & Detect</button>
+        <div style="margin-top:0.5rem">
+          <button class="btn-outline" id="startCameraBtn" data-i18n="start_camera_btn">Start Camera</button>
+          <button class="btn-primary" id="captureBtn" disabled data-i18n="capture_detect_btn">Capture & Detect</button>
+        </div>
         <div id="webcamResult" style="margin-top:1rem"></div>
       </div>
 
       <!-- History Panel -->
       <div class="card">
-        <h3>📜 History</h3>
+        <h3 data-i18n="history_title">📜 History</h3>
         <div class="history-filters">
-          <select id="historyFilterType"><option value="all">All</option><option value="REAL">Real only</option><option value="FAKE">Fake only</option></select>
+          <select id="historyFilterType"><option value="all" data-i18n="filter_all">All</option><option value="REAL" data-i18n="filter_real">Real only</option><option value="FAKE" data-i18n="filter_fake">Fake only</option></select>
           <input type="date" id="historyDateFrom" placeholder="From">
           <input type="date" id="historyDateTo" placeholder="To">
-          <button class="btn-outline" id="applyHistoryFilter">Apply</button>
+          <button class="btn-outline" id="applyHistoryFilter" data-i18n="apply_filter_btn">Apply</button>
         </div>
         <div id="historyList"></div>
-        <button class="btn-outline" id="clearHistoryBtn" style="margin-top:1rem">Clear History</button>
+        <button class="btn-outline" id="clearHistoryBtn" style="margin-top:1rem" data-i18n="clear_history_btn">Clear History</button>
       </div>
 
       <!-- Model Info -->
       <div class="card">
-        <h3>🧠 Model Info</h3>
-        <p><strong>Architecture:</strong> MesoNet (custom CNN)</p>
-        <p><strong>Accuracy:</strong> ~95% on Celeb-DF</p>
-        <p><strong>Input:</strong> 64x64 grayscale face crops</p>
+        <h3 data-i18n="model_info_title">🧠 Model Info</h3>
+        <p><strong data-i18n="architecture_info">Architecture:</strong> MesoNet (custom CNN)</p>
+        <p><strong data-i18n="accuracy_info">Accuracy:</strong> ~95% on Celeb-DF</p>
+        <p><strong data-i18n="input_info">Input:</strong> 64x64 grayscale face crops</p>
       </div>
+    </div>
 
-      <!-- Admin Panel -->
-      <div class="card">
-        <h3>⚙️ Admin Panel (Training)</h3>
-        <input type="file" id="datasetUpload" accept=".zip" style="margin-bottom:0.5rem">
-        <button class="btn-outline" id="trainBtn">Retrain Model</button>
-        <div id="trainLogs" style="font-size:0.8rem; margin-top:1rem"></div>
+    <!-- Profile Section -->
+    <div id="profileSection" class="section">
+      <div class="card profile-card">
+        <h2><i class="fas fa-user-circle"></i> <span data-i18n="profile_title">My Profile</span></h2>
+        <div class="profile-info">
+          <div class="info-row">
+            <span class="info-label"><i class="fas fa-user"></i> <span data-i18n="profile_name_label">Name:</span></span>
+            <span class="info-value" id="profileNameDisplay"></span>
+            <button id="editNameBtn" class="btn-outline" style="padding:0.3rem 1rem" data-i18n="edit_btn">Edit</button>
+          </div>
+          <div id="editNameContainer" class="edit-name-container" style="display:none;">
+            <input type="text" id="editNameInput" class="edit-name-input" placeholder="Enter new name">
+            <div class="edit-buttons">
+              <button id="saveNameBtn" class="btn-primary" data-i18n="save_btn">Save</button>
+              <button id="cancelEditBtn" class="btn-outline" data-i18n="cancel_btn">Cancel</button>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><i class="fas fa-envelope"></i> <span data-i18n="profile_email_label">Email:</span></span>
+            <span class="info-value" id="profileEmailDisplay"></span>
+          </div>
+        </div>
+        <h3><i class="fas fa-chart-simple"></i> <span data-i18n="activity_stats_title">Your Activity</span></h3>
+        <div class="stat-group">
+          <div class="stat-badge"><div id="profileTotalUploads">0</div><div data-i18n="total_uploads_label">Total Uploads</div></div>
+          <div class="stat-badge"><div id="profileFakeCount">0</div><div data-i18n="fake_detected_label">Fake Detected</div></div>
+          <div class="stat-badge"><div id="profileRealCount">0</div><div data-i18n="real_detected_label">Real Detected</div></div>
+        </div>
+        <h3><i class="fas fa-clock"></i> <span data-i18n="recent_activity_title">Recent Activity</span></h3>
+        <div id="recentActivityList"></div>
+        <div style="margin-top: 1.5rem;">
+          <button id="profileLogoutBtn" class="btn-outline" style="width:100%" data-i18n="logout_btn">Logout</button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Modals -->
   <div id="zoomModal" class="modal"><div class="modal-content"><span class="modal-close">&times;</span><img id="zoomImage" style="max-width:100%"></div></div>
-  <div id="detailsModal" class="modal"><div class="modal-content"><span class="modal-close">&times;</span><h3>Detailed Analysis</h3><div id="detailsContent"></div></div></div>
+  <div id="detailsModal" class="modal"><div class="modal-content"><span class="modal-close">&times;</span><h3 data-i18n="detailed_analysis_title">Detailed Analysis</h3><div id="detailsContent"></div></div></div>
 
   <div id="toast" class="toast"></div>
 
   <script>
+    // ---------- Translation Data ----------
+    const translations = {
+      en: {
+        hero_title: "AI-Powered Detection",
+        hero_desc: "Detect manipulated media with state-of-the-art AI. Upload images or videos and get instant analysis powered by the MesoNet architecture.",
+        try_now_btn: "Try Now →",
+        learn_more_btn: "Learn More",
+        model_label: "Model",
+        accuracy_label: "Accuracy",
+        dataset_label: "Dataset",
+        how_it_works_title: "How It Works",
+        upload_step_title: "Upload Media",
+        upload_step_desc: "Drop an image or video for analysis",
+        ai_step_title: "AI Analysis",
+        ai_step_desc: "MesoNet model processes the content",
+        result_step_title: "Get Results",
+        result_step_desc: "View confidence scores and verdict",
+        architecture_label: "ARCHITECTURE",
+        arch_desc: "Mesoscopic feature analysis CNN",
+        accuracy_detail_label: "PRECISION",
+        accuracy_desc: "Validated on benchmark datasets",
+        training_data_label: "TRAINING DATA",
+        training_desc: "High-quality celebrity deepfakes",
+        realtime_label: "Real-time Detection",
+        learn_more_link: "Learn more about deepfakes",
+        login_tab: "Login",
+        signup_tab: "Sign Up",
+        email_label: "Email",
+        password_label: "Password",
+        forgot_password_link: "Forgot Password?",
+        login_btn: "Login",
+        demo_note: "Demo: any email/password",
+        name_label: "Name",
+        confirm_password_label: "Confirm Password",
+        signup_btn: "Sign Up",
+        welcome_text: "Welcome",
+        upload_prompt: "Upload images or videos to detect deepfakes.",
+        image_detection_title: "📷 Image Detection",
+        drag_drop_image: "📸 Drag & drop or click to upload",
+        detect_btn: "Detect Deepfake",
+        download_pdf_btn: "📄 Download PDF Report",
+        show_details_btn: "🔍 Show Details",
+        video_detection_title: "🎥 Video Detection",
+        drag_drop_video: "🎥 Drag & drop video (MP4) or click to upload",
+        analyze_video_btn: "Analyze Video",
+        analytics_title: "📊 Analytics Dashboard",
+        total_uploads_label: "Total Uploads",
+        fake_detected_label: "Fake Detected",
+        real_detected_label: "Real Detected",
+        webcam_title: "📸 Real‑time Webcam Detection",
+        start_camera_btn: "Start Camera",
+        capture_detect_btn: "Capture & Detect",
+        history_title: "📜 History",
+        filter_all: "All",
+        filter_real: "Real only",
+        filter_fake: "Fake only",
+        apply_filter_btn: "Apply",
+        clear_history_btn: "Clear History",
+        model_info_title: "🧠 Model Info",
+        architecture_info: "Architecture:",
+        accuracy_info: "Accuracy:",
+        input_info: "Input:",
+        profile_title: "My Profile",
+        profile_name_label: "Name:",
+        edit_btn: "Edit",
+        save_btn: "Save",
+        cancel_btn: "Cancel",
+        profile_email_label: "Email:",
+        activity_stats_title: "Your Activity",
+        recent_activity_title: "Recent Activity",
+        logout_btn: "Logout",
+        detailed_analysis_title: "Detailed Analysis"
+      },
+      es: {
+        hero_title: "Detección Potenciada por IA",
+        hero_desc: "Detecta medios manipulados con IA de última generación. Sube imágenes o videos y obtén análisis instantáneo con la arquitectura MesoNet.",
+        try_now_btn: "Probar Ahora →",
+        learn_more_btn: "Más Información",
+        model_label: "Modelo",
+        accuracy_label: "Precisión",
+        dataset_label: "Conjunto de Datos",
+        how_it_works_title: "Cómo Funciona",
+        upload_step_title: "Subir Archivo",
+        upload_step_desc: "Arrastra una imagen o video para analizar",
+        ai_step_title: "Análisis IA",
+        ai_step_desc: "El modelo MesoNet procesa el contenido",
+        result_step_title: "Obtén Resultados",
+        result_step_desc: "Ver puntuaciones de confianza y veredicto",
+        architecture_label: "ARQUITECTURA",
+        arch_desc: "CNN de análisis mesoscópico",
+        accuracy_detail_label: "PRECISIÓN",
+        accuracy_desc: "Validado en conjuntos de datos de referencia",
+        training_data_label: "DATOS DE ENTRENAMIENTO",
+        training_desc: "Deepfakes de celebridades de alta calidad",
+        realtime_label: "Detección en Tiempo Real",
+        learn_more_link: "Más sobre deepfakes",
+        login_tab: "Iniciar Sesión",
+        signup_tab: "Registrarse",
+        email_label: "Correo Electrónico",
+        password_label: "Contraseña",
+        forgot_password_link: "¿Olvidaste tu contraseña?",
+        login_btn: "Iniciar Sesión",
+        demo_note: "Demo: cualquier correo/contraseña",
+        name_label: "Nombre",
+        confirm_password_label: "Confirmar Contraseña",
+        signup_btn: "Registrarse",
+        welcome_text: "Bienvenido",
+        upload_prompt: "Sube imágenes o videos para detectar deepfakes.",
+        image_detection_title: "📷 Detección de Imágenes",
+        drag_drop_image: "📸 Arrastra o haz clic para subir",
+        detect_btn: "Detectar Deepfake",
+        download_pdf_btn: "📄 Descargar Informe PDF",
+        show_details_btn: "🔍 Mostrar Detalles",
+        video_detection_title: "🎥 Detección de Videos",
+        drag_drop_video: "🎥 Arrastra un video (MP4) o haz clic",
+        analyze_video_btn: "Analizar Video",
+        analytics_title: "📊 Panel de Análisis",
+        total_uploads_label: "Subidas Totales",
+        fake_detected_label: "Falsos Detectados",
+        real_detected_label: "Reales Detectados",
+        webcam_title: "📸 Detección en Tiempo Real con Cámara",
+        start_camera_btn: "Iniciar Cámara",
+        capture_detect_btn: "Capturar y Detectar",
+        history_title: "📜 Historial",
+        filter_all: "Todos",
+        filter_real: "Solo Reales",
+        filter_fake: "Solo Falsos",
+        apply_filter_btn: "Aplicar",
+        clear_history_btn: "Borrar Historial",
+        model_info_title: "🧠 Información del Modelo",
+        architecture_info: "Arquitectura:",
+        accuracy_info: "Precisión:",
+        input_info: "Entrada:",
+        profile_title: "Mi Perfil",
+        profile_name_label: "Nombre:",
+        edit_btn: "Editar",
+        save_btn: "Guardar",
+        cancel_btn: "Cancelar",
+        profile_email_label: "Correo:",
+        activity_stats_title: "Tu Actividad",
+        recent_activity_title: "Actividad Reciente",
+        logout_btn: "Cerrar Sesión",
+        detailed_analysis_title: "Análisis Detallado"
+      },
+      hi: {
+        hero_title: "एआई-संचालित पहचान",
+        hero_desc: "अत्याधुनिक एआई के साथ हेरफेर की गई मीडिया का पता लगाएं। छवियाँ या वीडियो अपलोड करें और MesoNet आर्किटेक्चर द्वारा संचालित त्वरित विश्लेषण प्राप्त करें।",
+        try_now_btn: "अभी आज़माएं →",
+        learn_more_btn: "और जानें",
+        model_label: "मॉडल",
+        accuracy_label: "सटीकता",
+        dataset_label: "डेटासेट",
+        how_it_works_title: "यह कैसे काम करता है",
+        upload_step_title: "मीडिया अपलोड करें",
+        upload_step_desc: "विश्लेषण के लिए छवि या वीडियो ड्रॉप करें",
+        ai_step_title: "एआई विश्लेषण",
+        ai_step_desc: "MesoNet मॉडल सामग्री संसाधित करता है",
+        result_step_title: "परिणाम प्राप्त करें",
+        result_step_desc: "विश्वास स्कोर और निर्णय देखें",
+        architecture_label: "आर्किटेक्चर",
+        arch_desc: "मेसोस्कोपिक फीचर विश्लेषण CNN",
+        accuracy_detail_label: "सटीकता",
+        accuracy_desc: "बेंचमार्क डेटासेट पर मान्य",
+        training_data_label: "प्रशिक्षण डेटा",
+        training_desc: "उच्च गुणवत्ता वाले सेलिब्रिटी डीपफेक",
+        realtime_label: "वास्तविक समय पहचान",
+        learn_more_link: "डीपफेक के बारे में और जानें",
+        login_tab: "लॉगिन",
+        signup_tab: "साइन अप",
+        email_label: "ईमेल",
+        password_label: "पासवर्ड",
+        forgot_password_link: "पासवर्ड भूल गए?",
+        login_btn: "लॉगिन",
+        demo_note: "डेमो: कोई भी ईमेल/पासवर्ड",
+        name_label: "नाम",
+        confirm_password_label: "पासवर्ड की पुष्टि करें",
+        signup_btn: "साइन अप",
+        welcome_text: "स्वागत है",
+        upload_prompt: "डीपफेक का पता लगाने के लिए छवियाँ या वीडियो अपलोड करें।",
+        image_detection_title: "📷 छवि पहचान",
+        drag_drop_image: "📸 खींचें और छोड़ें या अपलोड करने के लिए क्लिक करें",
+        detect_btn: "डीपफेक का पता लगाएं",
+        download_pdf_btn: "📄 पीडीएफ रिपोर्ट डाउनलोड करें",
+        show_details_btn: "🔍 विवरण दिखाएं",
+        video_detection_title: "🎥 वीडियो पहचान",
+        drag_drop_video: "🎥 खींचें और छोड़ें या अपलोड करें",
+        analyze_video_btn: "वीडियो का विश्लेषण करें",
+        analytics_title: "📊 एनालिटिक्स डैशबोर्ड",
+        total_uploads_label: "कुल अपलोड",
+        fake_detected_label: "फेक का पता चला",
+        real_detected_label: "रियल का पता चला",
+        webcam_title: "📸 वास्तविक समय वेबकैम पहचान",
+        start_camera_btn: "कैमरा शुरू करें",
+        capture_detect_btn: "कैप्चर करें और पता लगाएं",
+        history_title: "📜 इतिहास",
+        filter_all: "सभी",
+        filter_real: "केवल रियल",
+        filter_fake: "केवल फेक",
+        apply_filter_btn: "लागू करें",
+        clear_history_btn: "इतिहास साफ़ करें",
+        model_info_title: "🧠 मॉडल जानकारी",
+        architecture_info: "आर्किटेक्चर:",
+        accuracy_info: "सटीकता:",
+        input_info: "इनपुट:",
+        profile_title: "मेरी प्रोफ़ाइल",
+        profile_name_label: "नाम:",
+        edit_btn: "संपादित करें",
+        save_btn: "सहेजें",
+        cancel_btn: "रद्द करें",
+        profile_email_label: "ईमेल:",
+        activity_stats_title: "आपकी गतिविधि",
+        recent_activity_title: "हाल की गतिविधि",
+        logout_btn: "लॉगआउट",
+        detailed_analysis_title: "विस्तृत विश्लेषण"
+      },
+      fr: {
+        hero_title: "Détection Alimentée par l'IA",
+        hero_desc: "Détectez les médias manipulés avec une IA de pointe. Téléchargez des images ou des vidéos et obtenez une analyse instantanée grâce à l'architecture MesoNet.",
+        try_now_btn: "Essayer →",
+        learn_more_btn: "En savoir plus",
+        model_label: "Modèle",
+        accuracy_label: "Précision",
+        dataset_label: "Jeu de données",
+        how_it_works_title: "Comment ça marche",
+        upload_step_title: "Télécharger un média",
+        upload_step_desc: "Déposez une image ou une vidéo pour analyse",
+        ai_step_title: "Analyse IA",
+        ai_step_desc: "Le modèle MesoNet traite le contenu",
+        result_step_title: "Obtenir les résultats",
+        result_step_desc: "Voir les scores de confiance et le verdict",
+        architecture_label: "ARCHITECTURE",
+        arch_desc: "CNN d'analyse mésoscopique",
+        accuracy_detail_label: "PRÉCISION",
+        accuracy_desc: "Validé sur des jeux de données de référence",
+        training_data_label: "DONNÉES D'ENTRAÎNEMENT",
+        training_desc: "Deepfakes de célébrités de haute qualité",
+        realtime_label: "Détection en temps réel",
+        learn_more_link: "En savoir plus sur les deepfakes",
+        login_tab: "Connexion",
+        signup_tab: "Inscription",
+        email_label: "Email",
+        password_label: "Mot de passe",
+        forgot_password_link: "Mot de passe oublié ?",
+        login_btn: "Se connecter",
+        demo_note: "Démo : n'importe quel email/mot de passe",
+        name_label: "Nom",
+        confirm_password_label: "Confirmer le mot de passe",
+        signup_btn: "S'inscrire",
+        welcome_text: "Bienvenue",
+        upload_prompt: "Téléchargez des images ou des vidéos pour détecter les deepfakes.",
+        image_detection_title: "📷 Détection d'image",
+        drag_drop_image: "📸 Glissez-déposez ou cliquez pour télécharger",
+        detect_btn: "Détecter le deepfake",
+        download_pdf_btn: "📄 Télécharger le rapport PDF",
+        show_details_btn: "🔍 Afficher les détails",
+        video_detection_title: "🎥 Détection vidéo",
+        drag_drop_video: "🎥 Glissez-déposez une vidéo (MP4) ou cliquez",
+        analyze_video_btn: "Analyser la vidéo",
+        analytics_title: "📊 Tableau de bord analytique",
+        total_uploads_label: "Total téléchargements",
+        fake_detected_label: "Faux détectés",
+        real_detected_label: "Réels détectés",
+        webcam_title: "📸 Détection en temps réel par webcam",
+        start_camera_btn: "Démarrer la caméra",
+        capture_detect_btn: "Capturer et détecter",
+        history_title: "📜 Historique",
+        filter_all: "Tous",
+        filter_real: "Réels uniquement",
+        filter_fake: "Faux uniquement",
+        apply_filter_btn: "Appliquer",
+        clear_history_btn: "Effacer l'historique",
+        model_info_title: "🧠 Informations du modèle",
+        architecture_info: "Architecture :",
+        accuracy_info: "Précision :",
+        input_info: "Entrée :",
+        profile_title: "Mon profil",
+        profile_name_label: "Nom :",
+        edit_btn: "Modifier",
+        save_btn: "Enregistrer",
+        cancel_btn: "Annuler",
+        profile_email_label: "Email :",
+        activity_stats_title: "Votre activité",
+        recent_activity_title: "Activité récente",
+        logout_btn: "Déconnexion",
+        detailed_analysis_title: "Analyse détaillée"
+      }
+    };
+
+    let currentLang = localStorage.getItem('language') || 'en';
+
+    function setLanguage(lang) {
+      if (!translations[lang]) return;
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+          if (el.tagName === 'INPUT' && el.placeholder) {
+            el.placeholder = t[key];
+          } else {
+            el.innerText = t[key];
+          }
+        }
+      });
+      localStorage.setItem('language', lang);
+      currentLang = lang;
+      document.getElementById('langSelect').value = lang;
+    }
+
+    document.getElementById('langSelect').addEventListener('change', (e) => setLanguage(e.target.value));
+
     // ---------- DOM Elements ----------
     const landingSection = document.getElementById('landingSection');
     const authSection = document.getElementById('authSection');
     const dashboardSection = document.getElementById('dashboardSection');
+    const profileSection = document.getElementById('profileSection');
     const tryNowBtn = document.getElementById('tryNowBtn');
     const landingTryBtn = document.getElementById('landingTryBtn');
     const learnMoreBtn = document.getElementById('learnMoreBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const profileNavBtn = document.getElementById('profileNavBtn');
+    const dashboardNavBtn = document.getElementById('dashboardNavBtn');
     const themeToggle = document.getElementById('themeToggle');
-    const langSwitch = document.getElementById('langSwitch');
-    // Auth elements
+    // Auth
     const loginFormDiv = document.getElementById('loginForm');
     const signupFormDiv = document.getElementById('signupForm');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const loginBtn = document.getElementById('loginBtn');
     const signupBtn = document.getElementById('signupBtn');
     const forgotLink = document.getElementById('forgotPasswordLink');
-    // Image detection
+    // Image
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
@@ -684,11 +1251,13 @@
     const videoResultDiv = document.getElementById('videoResult');
     const frameResultsDiv = document.getElementById('frameResults');
     // Analytics
-    let analyticsChart = null;
+    let barChart, pieChart;
     // Webcam
     const webcamVideo = document.getElementById('webcamVideo');
+    const startCameraBtn = document.getElementById('startCameraBtn');
     const captureBtn = document.getElementById('captureBtn');
     const webcamResult = document.getElementById('webcamResult');
+    let webcamStream = null;
     // History
     const historyList = document.getElementById('historyList');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
@@ -696,27 +1265,52 @@
     const historyDateFrom = document.getElementById('historyDateFrom');
     const historyDateTo = document.getElementById('historyDateTo');
     const applyHistoryFilter = document.getElementById('applyHistoryFilter');
-    // Admin
-    const trainBtn = document.getElementById('trainBtn');
-    const trainLogs = document.getElementById('trainLogs');
-    const datasetUpload = document.getElementById('datasetUpload');
-    // User name span
     const userNameSpan = document.getElementById('userName');
+    // Profile
+    const profileNameDisplay = document.getElementById('profileNameDisplay');
+    const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+    const editNameBtn = document.getElementById('editNameBtn');
+    const editNameContainer = document.getElementById('editNameContainer');
+    const editNameInput = document.getElementById('editNameInput');
+    const saveNameBtn = document.getElementById('saveNameBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const profileTotalUploads = document.getElementById('profileTotalUploads');
+    const profileFakeCount = document.getElementById('profileFakeCount');
+    const profileRealCount = document.getElementById('profileRealCount');
+    const recentActivityList = document.getElementById('recentActivityList');
+    const profileLogoutBtn = document.getElementById('profileLogoutBtn');
 
     let selectedFile = null;
     let currentUser = null;
     let currentPrediction = null;
+    let isAnalyzing = false;
 
-    // Helper: show toast
+    // ---------- Toast ----------
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.style.borderLeftColor = isError ? '#f87171' : '#4ade80';
+      if (window.toastTimeout) clearTimeout(window.toastTimeout);
+      const icon = isError ? '❌' : '✅';
+      const typeClass = isError ? 'error' : 'success';
+      toast.innerHTML = `
+        <div class="toast-content">
+          <div class="toast-icon">${icon}</div>
+          <div class="toast-message">${msg}</div>
+          <button class="toast-close">&times;</button>
+        </div>
+      `;
+      toast.className = `toast ${typeClass}`;
       toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 3000);
+      const closeBtn = toast.querySelector('.toast-close');
+      closeBtn.addEventListener('click', () => {
+        toast.style.display = 'none';
+        if (window.toastTimeout) clearTimeout(window.toastTimeout);
+      });
+      window.toastTimeout = setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
     }
 
-    // User-specific storage
+    // ---------- History helpers ----------
     function getHistoryKey(email) { return `history_${email}`; }
     function loadHistoryForUser(email) { const stored = localStorage.getItem(getHistoryKey(email)); return stored ? JSON.parse(stored) : []; }
     function saveHistoryForUser(email, history) { localStorage.setItem(getHistoryKey(email), JSON.stringify(history)); }
@@ -728,12 +1322,14 @@
       saveHistoryForUser(currentUser.email, history);
       renderHistory();
       updateAnalytics();
+      updateProfileStats();
     }
     function clearHistoryForUser() {
       if (!currentUser) return;
       saveHistoryForUser(currentUser.email, []);
       renderHistory();
       updateAnalytics();
+      updateProfileStats();
       showToast('History cleared');
     }
     function renderHistory() {
@@ -745,13 +1341,16 @@
       if (filter !== 'all') history = history.filter(item => item.result === filter);
       if (from) history = history.filter(item => new Date(item.date) >= from);
       if (to) history = history.filter(item => new Date(item.date) <= new Date(to + 'T23:59:59'));
-      if (!history.length) { historyList.innerHTML = '<p>No history yet.</p>'; return; }
-      historyList.innerHTML = history.map(item => `
-        <div class="history-item">
-          <div><strong>${item.fileName}</strong><br><small>${new Date(item.date).toLocaleString()}</small></div>
-          <div><span class="history-result ${item.result === 'REAL' ? 'real-badge' : 'fake-badge'}">${item.result}</span><br>${(item.confidence*100).toFixed(1)}%</div>
-        </div>
-      `).join('');
+      if (!history.length) { historyList.innerHTML = '<p data-i18n="no_history">No history yet.</p>'; } else {
+        historyList.innerHTML = history.map(item => `
+          <div class="history-item">
+            <div><strong>${item.fileName}</strong><br><small>${new Date(item.date).toLocaleString()}</small></div>
+            <div><span class="history-result ${item.result === 'REAL' ? 'real-badge' : 'fake-badge'}">${item.result}</span><br>${(item.confidence*100).toFixed(1)}%</div>
+          </div>
+        `).join('');
+      }
+      const noHistory = historyList.querySelector('p[data-i18n="no_history"]');
+      if (noHistory) noHistory.innerText = translations[currentLang].no_history || 'No history yet.';
     }
     function updateAnalytics() {
       if (!currentUser) return;
@@ -762,62 +1361,185 @@
       document.getElementById('totalUploads').innerText = total;
       document.getElementById('fakeCount').innerText = fake;
       document.getElementById('realCount').innerText = real;
-      if (analyticsChart) {
-        analyticsChart.data.datasets[0].data = [real, fake];
-        analyticsChart.update();
+      if (barChart) {
+        barChart.data.datasets[0].data = [real, fake];
+        barChart.update();
+      }
+      if (pieChart) {
+        pieChart.data.datasets[0].data = [real, fake];
+        pieChart.update();
       }
     }
 
-    // Auth
-    function login(email, password) {
-      if (!email || !password) { showToast('Please enter email and password', true); return false; }
-      const name = email.split('@')[0];
-      const user = { name, email };
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      currentUser = user;
-      updateAuthUI();
-      showToast('Login successful!');
-      return true;
+    // ---------- Profile functions ----------
+    function updateProfileStats() {
+      if (!currentUser) return;
+      const history = loadHistoryForUser(currentUser.email);
+      const total = history.length;
+      const fake = history.filter(h => h.result === 'FAKE').length;
+      const real = total - fake;
+      profileTotalUploads.innerText = total;
+      profileFakeCount.innerText = fake;
+      profileRealCount.innerText = real;
+      const recent = history.slice(0, 5);
+      if (!recent.length) {
+        recentActivityList.innerHTML = '<p data-i18n="no_recent">No recent activity.</p>';
+        const noRecent = recentActivityList.querySelector('p[data-i18n="no_recent"]');
+        if (noRecent) noRecent.innerText = translations[currentLang].no_recent || 'No recent activity.';
+      } else {
+        recentActivityList.innerHTML = recent.map(item => `
+          <div class="recent-item">
+            <div><strong>${item.fileName}</strong><br><small>${new Date(item.date).toLocaleString()}</small></div>
+            <div><span class="history-result ${item.result === 'REAL' ? 'real-badge' : 'fake-badge'}">${item.result}</span><br>${(item.confidence*100).toFixed(1)}%</div>
+          </div>
+        `).join('');
+      }
     }
-    function signup(name, email, password, confirm) {
-      if (!name || !email || !password || !confirm) { showToast('All fields required', true); return false; }
-      if (password !== confirm) { showToast('Passwords do not match', true); return false; }
-      if (!email.includes('@')) { showToast('Invalid email', true); return false; }
-      const user = { name, email };
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      currentUser = user;
-      updateAuthUI();
-      showToast('Account created!');
-      return true;
+    function updateProfileUserInfo() {
+      if (currentUser) {
+        profileNameDisplay.innerText = currentUser.name;
+        profileEmailDisplay.innerText = currentUser.email;
+        editNameInput.value = currentUser.name;
+      }
+    }
+    function enableEditName() {
+      editNameContainer.style.display = 'flex';
+      editNameBtn.style.display = 'none';
+      editNameInput.focus();
+    }
+    function cancelEditName() {
+      editNameContainer.style.display = 'none';
+      editNameBtn.style.display = 'inline-block';
+    }
+    async function saveName() {
+      const newName = editNameInput.value.trim();
+      if (!newName) {
+        showToast('Name cannot be empty', true);
+        return;
+      }
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch('/api/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name: newName })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser.name = newName;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          userNameSpan.innerText = newName;
+          profileNameDisplay.innerText = newName;
+          cancelEditName();
+          showToast('Name updated successfully!');
+        } else {
+          showToast(data.error || 'Failed to update name', true);
+        }
+      } catch (err) {
+        showToast('Error updating name', true);
+      }
+    }
+
+    // ---------- Authentication ----------
+    async function login(email, password) {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        currentUser = data.user;
+        updateAuthUI();
+        showToast('Login successful!');
+      } else {
+        showToast(data.error, true);
+      }
+    }
+    async function signup(name, email, password, confirm) {
+      if (password !== confirm) {
+        showToast('Passwords do not match', true);
+        return;
+      }
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        login(email, password);
+      } else {
+        showToast(data.error, true);
+      }
     }
     function logout() {
-      localStorage.removeItem('currentUser');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+        webcamVideo.srcObject = null;
+      }
       currentUser = null;
       updateAuthUI();
       showToast('Logged out');
     }
     function updateAuthUI() {
-      const stored = localStorage.getItem('currentUser');
-      if (stored) {
-        currentUser = JSON.parse(stored);
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        currentUser = JSON.parse(storedUser);
         userNameSpan.textContent = currentUser.name;
         landingSection.classList.remove('active');
         authSection.classList.remove('active');
         dashboardSection.classList.add('active');
+        profileSection.classList.remove('active');
         logoutBtn.style.display = 'block';
+        profileNavBtn.style.display = 'inline-block';
+        dashboardNavBtn.style.display = 'inline-block';
+        tryNowBtn.style.display = 'none';           
         resetDashboardUI();
         renderHistory();
         updateAnalytics();
-        initChart();
-        initWebcam();
+        initCharts();
+        updateProfileUserInfo();
+        updateProfileStats();
       } else {
         currentUser = null;
         landingSection.classList.add('active');
         authSection.classList.remove('active');
         dashboardSection.classList.remove('active');
+        profileSection.classList.remove('active');
         logoutBtn.style.display = 'none';
+        profileNavBtn.style.display = 'none';
+        dashboardNavBtn.style.display = 'none';
+        tryNowBtn.style.display = 'inline-block';
+
         resetDashboardUI();
       }
+    }
+    function showDashboard() {
+      dashboardSection.classList.add('active');
+      profileSection.classList.remove('active');
+      resetDashboardUI();
+      renderHistory();
+      updateAnalytics();
+    }
+    function showProfile() {
+      dashboardSection.classList.remove('active');
+      profileSection.classList.add('active');
+      updateProfileStats();
+    }
+    function showLanding() {
+      landingSection.classList.add('active');
+      authSection.classList.remove('active');
+      dashboardSection.classList.remove('active');
+      profileSection.classList.remove('active');
     }
     function resetDashboardUI() {
       selectedFile = null;
@@ -833,14 +1555,25 @@
       videoResultDiv.innerHTML = '';
       frameResultsDiv.innerHTML = '';
       webcamResult.innerHTML = '';
-      currentPrediction = null; // Clear saved prediction
+      currentPrediction = null;
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+        webcamVideo.srcObject = null;
+        captureBtn.disabled = true;
+      }
     }
 
-    // Prediction
+    // ---------- Image Prediction ----------
     async function predict(file) {
       const fd = new FormData();
       fd.append('image', file);
-      const res = await fetch('/api/predict', { method: 'POST', body: fd });
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/predict', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: fd
+      });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       return { is_real: data.is_real, confidence: data.confidence };
@@ -858,7 +1591,10 @@
       currentPrediction = { isReal, confidence, fileName: selectedFile?.name };
     }
     async function handlePrediction() {
-      if (!selectedFile) return;
+      if (!selectedFile || isAnalyzing) return;
+      isAnalyzing = true;
+      const originalBtnText = predictBtn.innerText;
+      predictBtn.innerText = 'Analyzing...';
       predictBtn.disabled = true;
       loader.style.display = 'block';
       uploadProgressBar.style.display = 'block';
@@ -869,7 +1605,7 @@
         const result = await predict(selectedFile);
         clearInterval(interval);
         progressFill.style.width = '100%';
-        setTimeout(() => uploadProgressBar.style.display = 'none', 500);
+        setTimeout(() => (uploadProgressBar.style.display = 'none'), 500);
         updateResultUI(result.is_real, result.confidence);
         addToHistory(selectedFile.name, result.is_real ? 'REAL' : 'FAKE', result.confidence);
       } catch (err) {
@@ -877,8 +1613,10 @@
         uploadProgressBar.style.display = 'none';
         showToast(err.message, true);
       } finally {
+        predictBtn.innerText = originalBtnText;
         predictBtn.disabled = false;
         loader.style.display = 'none';
+        isAnalyzing = false;
       }
     }
     function handleFile(file) {
@@ -891,12 +1629,12 @@
         preview.style.display = 'block';
         predictBtn.disabled = false;
         resultContainer.style.display = 'none';
-        currentPrediction = null; // clear old result
+        currentPrediction = null;
       };
       reader.readAsDataURL(file);
     }
 
-    // Video handling (simulated)
+    // ---------- Video Detection ----------
     function handleVideo(file) {
       if (!file.type.startsWith('video/')) { showToast('Please upload a video', true); return; }
       if (file.size > 100 * 1024 * 1024) { showToast('File too large (max 100MB)', true); return; }
@@ -904,66 +1642,101 @@
       videoPlayer.src = url;
       videoPreview.style.display = 'block';
       analyzeVideoBtn.disabled = false;
+      videoResultDiv.style.display = 'none';
+      frameResultsDiv.innerHTML = '';
     }
     async function analyzeVideo() {
+      const file = videoFileInput.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('video', file);
       analyzeVideoBtn.disabled = true;
       videoResultDiv.style.display = 'block';
-      videoResultDiv.innerHTML = 'Analyzing video frames...';
-      setTimeout(() => {
-        videoResultDiv.innerHTML = '<span style="color:#4ade80">✅ Analysis complete (simulated)</span><br>Fake probability: 87%<br>Real frames: 12 / 100';
-        frameResultsDiv.innerHTML = '<p>Frame results: Frame 15, 42, 78 flagged as fake.</p><input type="range" min="0" max="99" value="0" style="width:100%">';
-        showToast('Video analysis completed (demo)', false);
+      videoResultDiv.innerHTML = 'Extracting frames and analyzing video...';
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/predict-video', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        videoResultDiv.innerHTML = `
+          <span style="color:${data.overall === 'FAKE' ? '#f87171' : '#4ade80'}">✅ Analysis complete</span><br>
+          Overall verdict: <strong>${data.overall}</strong><br>
+          Fake frames: ${data.fake_frames} / ${data.frames_analyzed}<br>
+          Fake percentage: ${data.fake_percentage.toFixed(1)}%
+        `;
+        const sliderHtml = `
+          <p>Frame details:</p>
+          <input type="range" min="0" max="${data.frames_analyzed-1}" value="0" step="1" style="width:100%" id="frameSlider">
+          <div id="frameInfo"></div>
+        `;
+        frameResultsDiv.innerHTML = sliderHtml;
+        const slider = document.getElementById('frameSlider');
+        const frameInfo = document.getElementById('frameInfo');
+        slider.addEventListener('input', (e) => {
+          const idx = parseInt(e.target.value);
+          const frame = data.results[idx];
+          frameInfo.innerHTML = `Frame ${idx+1}: ${frame.is_fake ? 'FAKE' : 'REAL'} (confidence: ${(frame.confidence*100).toFixed(1)}%)`;
+        });
+        slider.dispatchEvent(new Event('input'));
+      } catch (err) {
+        videoResultDiv.innerHTML = `<span style="color:#f87171">Error: ${err.message}</span>`;
+        showToast(err.message, true);
+      } finally {
         analyzeVideoBtn.disabled = false;
-      }, 2000);
+      }
     }
 
-    // Report generation
+    // ---------- PDF Report ----------
     function generateReport() {
-  if (!currentPrediction) {
-    showToast('No prediction available. Please detect an image first.', true);
-    return;
-  }
-  // Create a temporary container (hidden off-screen)
-  const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
-  container.style.width = '800px';
-  container.style.background = 'white';
-  container.style.padding = '2rem';
-  container.style.fontFamily = 'sans-serif';
-  container.innerHTML = `
-    <h1 style="color:#6c2bd9;">Deepfake Detection Report</h1>
-    <p><strong>File:</strong> ${currentPrediction.fileName}</p>
-    <p><strong>Result:</strong> ${currentPrediction.isReal ? 'REAL' : 'FAKE'}</p>
-    <p><strong>Confidence:</strong> ${(currentPrediction.confidence*100).toFixed(1)}%</p>
-    <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
-    <p><strong>Model:</strong> MesoNet (accuracy ~95%)</p>
-    <p><strong>Explanation:</strong> The model analyzes mesoscopic features of faces to detect manipulation artifacts.</p>
-  `;
-  document.body.appendChild(container);
-
-  // Generate PDF
-  html2pdf()
-    .from(container)
-    .set({ margin: 0.5, filename: 'deepfake_report.pdf' })
-    .save()
-    .then(() => {
-      document.body.removeChild(container);
-    })
-    .catch(err => {
-      console.error(err);
-      document.body.removeChild(container);
-      showToast('Failed to generate PDF', true);
-    });
-}
-
-    // Details modal
-    function showDetails() {
       if (!currentPrediction) {
         showToast('No prediction available. Please detect an image first.', true);
         return;
       }
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+      modal.style.zIndex = '10000';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.backdropFilter = 'blur(4px)';
+      const reportDiv = document.createElement('div');
+      reportDiv.style.backgroundColor = '#fff';
+      reportDiv.style.color = '#000';
+      reportDiv.style.padding = '2rem';
+      reportDiv.style.borderRadius = '1rem';
+      reportDiv.style.maxWidth = '500px';
+      reportDiv.style.width = '90%';
+      reportDiv.style.fontFamily = 'sans-serif';
+      reportDiv.innerHTML = `
+        <h1 style="color:#6c2bd9;">Deepfake Detection Report</h1>
+        <p><strong>File:</strong> ${currentPrediction.fileName}</p>
+        <p><strong>Result:</strong> ${currentPrediction.isReal ? 'REAL' : 'FAKE'}</p>
+        <p><strong>Confidence:</strong> ${(currentPrediction.confidence*100).toFixed(1)}%</p>
+        <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Model:</strong> MesoNet (accuracy ~95%)</p>
+        <p><strong>Explanation:</strong> The model analyzes mesoscopic features of faces to detect manipulation artifacts.</p>
+        <button id="closePdfModal" style="margin-top:1rem; padding:0.5rem 1rem; background:#6c2bd9; color:white; border:none; border-radius:0.5rem;">Close</button>
+      `;
+      modal.appendChild(reportDiv);
+      document.body.appendChild(modal);
+      html2pdf().from(reportDiv).set({ margin: 0.5, filename: 'deepfake_report.pdf' }).save()
+        .then(() => document.body.removeChild(modal))
+        .catch(err => { console.error(err); document.body.removeChild(modal); showToast('Failed to generate PDF', true); });
+      const closeBtn = reportDiv.querySelector('#closePdfModal');
+      closeBtn.addEventListener('click', () => document.body.removeChild(modal));
+    }
+
+    function showDetails() {
+      if (!currentPrediction) { showToast('No prediction available. Please detect an image first.', true); return; }
       const details = `
         <p><strong>File:</strong> ${currentPrediction.fileName}</p>
         <p><strong>Verdict:</strong> ${currentPrediction.isReal ? 'REAL' : 'FAKE'}</p>
@@ -976,27 +1749,46 @@
       document.getElementById('detailsModal').style.display = 'flex';
     }
 
-    // Analytics chart
-    function initChart() {
-      const ctx = document.getElementById('analyticsChart').getContext('2d');
-      if (analyticsChart) analyticsChart.destroy();
-      analyticsChart = new Chart(ctx, {
+    // ---------- Charts ----------
+    function initCharts() {
+      const ctxBar = document.getElementById('barChart').getContext('2d');
+      const ctxPie = document.getElementById('pieChart').getContext('2d');
+      if (barChart) barChart.destroy();
+      if (pieChart) pieChart.destroy();
+      barChart = new Chart(ctxBar, {
         type: 'bar',
         data: { labels: ['Real', 'Fake'], datasets: [{ label: 'Detections', data: [0,0], backgroundColor: ['#4ade80', '#f87171'] }] },
         options: { responsive: true, maintainAspectRatio: true }
       });
+      pieChart = new Chart(ctxPie, {
+        type: 'pie',
+        data: { labels: ['Real', 'Fake'], datasets: [{ data: [0,0], backgroundColor: ['#4ade80', '#f87171'] }] },
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+      });
       updateAnalytics();
     }
 
-    // Webcam simulation
-    async function initWebcam() {
+    // ---------- Webcam ----------
+    async function startCamera() {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+      }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        webcamStream = stream;
         webcamVideo.srcObject = stream;
-      } catch (err) { console.warn('Webcam not available', err); }
+        captureBtn.disabled = false;
+        webcamResult.innerHTML = '';
+        showToast('Camera started');
+      } catch (err) {
+        webcamResult.innerHTML = '<span style="color:#f87171">❌ Camera access denied or not available. Please enable camera and click Start Camera.</span>';
+        captureBtn.disabled = true;
+        showToast('Camera access failed', true);
+      }
     }
     async function captureAndDetect() {
-      if (!webcamVideo.srcObject) { showToast('Webcam not available', true); return; }
+      if (!webcamStream) { showToast('Please click "Start Camera" first', true); return; }
       const canvas = document.createElement('canvas');
       canvas.width = webcamVideo.videoWidth;
       canvas.height = webcamVideo.videoHeight;
@@ -1010,32 +1802,7 @@
       await handlePrediction();
     }
 
-    // Language switcher (mock)
-    let currentLang = 'en';
-    function toggleLang() {
-      currentLang = currentLang === 'en' ? 'es' : 'en';
-      langSwitch.innerText = currentLang === 'en' ? '🌐 EN' : '🌐 ES';
-      showToast(`Language switched to ${currentLang === 'en' ? 'English' : 'Spanish (demo)'}`, false);
-    }
-
-    // Admin training mock
-    async function trainModel() {
-      if (datasetUpload.files.length === 0) { showToast('Please select a dataset ZIP file', true); return; }
-      trainLogs.innerHTML = 'Training started...';
-      try {
-        const formData = new FormData();
-        formData.append('dataset', datasetUpload.files[0]);
-        const res = await fetch('/api/train', { method: 'POST', body: formData });
-        const data = await res.json();
-        trainLogs.innerHTML = `Training completed: ${data.message || 'Model updated'}`;
-        showToast('Training completed');
-      } catch {
-        trainLogs.innerHTML = 'Training endpoint not implemented (simulated)';
-        showToast('Training endpoint not ready', true);
-      }
-    }
-
-    // Modal close
+    // ---------- Modal close ----------
     document.querySelectorAll('.modal-close').forEach(el => {
       el.addEventListener('click', () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); });
     });
@@ -1043,13 +1810,14 @@
       if (event.target.classList.contains('modal')) event.target.style.display = 'none';
     };
 
-    // Event listeners
+    // ---------- Event listeners ----------
     tryNowBtn.addEventListener('click', () => { authSection.classList.add('active'); landingSection.classList.remove('active'); });
     landingTryBtn.addEventListener('click', () => { authSection.classList.add('active'); landingSection.classList.remove('active'); });
     learnMoreBtn.addEventListener('click', () => { window.scrollTo({ top: document.querySelector('.how-it-works').offsetTop, behavior: 'smooth' }); });
     logoutBtn.addEventListener('click', logout);
+    profileNavBtn.addEventListener('click', showProfile);
+    dashboardNavBtn.addEventListener('click', showDashboard);
     themeToggle.addEventListener('click', () => { document.body.classList.toggle('light'); themeToggle.textContent = document.body.classList.contains('light') ? '🌞 Light' : '🌙 Dark'; localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark'); });
-    langSwitch.addEventListener('click', toggleLang);
     // Auth tabs
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1081,16 +1849,83 @@
     // History filters
     applyHistoryFilter.addEventListener('click', renderHistory);
     clearHistoryBtn.addEventListener('click', () => { if (confirm('Clear all history?')) clearHistoryForUser(); });
-    // Admin
-    trainBtn.addEventListener('click', trainModel);
     // Webcam
+    startCameraBtn.addEventListener('click', startCamera);
     captureBtn.addEventListener('click', captureAndDetect);
+    // Profile
+    editNameBtn.addEventListener('click', enableEditName);
+    cancelEditBtn.addEventListener('click', cancelEditName);
+    saveNameBtn.addEventListener('click', saveName);
+    profileLogoutBtn.addEventListener('click', logout);
+    // Auth Home button
+    const authHomeBtn = document.getElementById('authHomeBtn');
+    if (authHomeBtn) {
+      authHomeBtn.addEventListener('click', showLanding);
+    }
+    // Audio detection
+    const audioUploadArea = document.getElementById('audioUploadArea');
+    const audioFileInput = document.getElementById('audioFileInput');
+    const audioPreview = document.getElementById('audioPreview');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const analyzeAudioBtn = document.getElementById('analyzeAudioBtn');
+    const audioResultDiv = document.getElementById('audioResult');
 
-    // Theme init
+    function handleAudio(file) {
+      if (!file.type.startsWith('audio/')) { showToast('Please upload an audio file', true); return; }
+      if (file.size > 100 * 1024 * 1024) { showToast('File too large (max 100MB)', true); return; }
+      const url = URL.createObjectURL(file);
+      audioPlayer.src = url;
+      audioPreview.style.display = 'block';
+      analyzeAudioBtn.disabled = false;
+      audioResultDiv.style.display = 'none';
+    }
+
+    async function analyzeAudio() {
+      const file = audioFileInput.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('audio', file);
+      analyzeAudioBtn.disabled = true;
+      audioResultDiv.style.display = 'block';
+      audioResultDiv.innerHTML = 'Analyzing audio...';
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/predict-audio', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        const resultText = data.is_real ? '✅ REAL VOICE' : '❌ DEEPFAKE VOICE';
+        const color = data.is_real ? '#4ade80' : '#f87171';
+        audioResultDiv.innerHTML = `<span style="color:${color}">${resultText}</span><br>Confidence: ${(data.confidence*100).toFixed(1)}%`;
+      } catch (err) {
+        audioResultDiv.innerHTML = `<span style="color:#f87171">Error: ${err.message}</span>`;
+        showToast(err.message, true);
+      } finally {
+        analyzeAudioBtn.disabled = false;
+      }
+    }
+
+    // Event listeners for audio
+    audioUploadArea.addEventListener('click', () => audioFileInput.click());
+    audioUploadArea.addEventListener('dragover', e => e.preventDefault());
+    audioUploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('audio/')) handleAudio(file);
+      else showToast('Please drop an audio file', true);
+    });
+    audioFileInput.addEventListener('change', e => { if (e.target.files[0]) handleAudio(e.target.files[0]); });
+    analyzeAudioBtn.addEventListener('click', analyzeAudio);
+
+    // ---------- Theme init ----------
     if (localStorage.getItem('theme') === 'light') document.body.classList.add('light');
     updateAuthUI();
     document.getElementById('loginEmail').value = 'demo@example.com';
     document.getElementById('loginPassword').value = 'demo';
+    setLanguage(currentLang);
   </script>
 </body>
 </html>
