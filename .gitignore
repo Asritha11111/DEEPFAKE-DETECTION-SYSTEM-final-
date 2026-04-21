@@ -1,0 +1,7 @@
+node_modules/
+dataset/
+saved_model/
+temp_frames*
+uploads/
+*.mp4
+*.h5
